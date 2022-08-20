@@ -3,10 +3,15 @@ import pandas as pd
 class ExcelMods:
     def excel_setcolwidth(filename, **dfs):
         '''
+        purpose
         sets column width of excel files
+
+        inputs
         filename: input fully qualified file location such as r'C:\\location\\file.xlsx'
         dfs: input dataframes to parse over as dictionary, such as {'name_of_df1':df1, 'name_of_df2':df2}
-        input dataframes to iterate over as 
+
+        outputs
+        resizes excel file column widths to match values so when you open the file you don't have to resize everything
         '''
         writer = pd.ExcelWriter(filename, engine='xlsxwriter')
         for sheetname, df in dfs.items():  # loop through `dict` of dataframes
