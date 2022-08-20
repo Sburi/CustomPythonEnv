@@ -1,7 +1,17 @@
+import numpy as np
 import pandas as pd
 
-def compare_dfs(dataframes, print_shared=True, print_unshared=True):
-    '''compares columns between arbitrary # of dataframes to determine what columns are similar and what are different'''
+def compare_dfs(dataframes: list, print_shared=True, print_unshared=True):
+    '''compares input list of dataframes to determine which columns are shared vs. unshared between said dataframes.
+    
+    inputs
+    dataframes: input a list of dataframes
+    print_shared: if true, prints any columns that are shared to screen
+    print_unshared: if true, prints any columns that are not shared to screen
+
+    returns
+    dfComparison with all columns to left, one column to denote shared columns, and one column to denote unshared columns
+    '''
 
     #ensure more than one df passed
     arg_count = len(dataframes)
