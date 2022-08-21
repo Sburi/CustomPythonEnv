@@ -23,6 +23,10 @@ class ExploratoryDataAnalyzer:
         return duplicates
     
     def show_proportions(self, df, col: str, verbose=False):
+        '''
+        shows proportion (percent and cumulative percent) for selected dataframe and column
+        '''
+        
         dfProportion = pd.DataFrame()
         dfProportion['Count'] = self.df[col].value_counts(normalize=False)
         dfProportion['Percent'] = self.df[col].value_counts(normalize=True)
