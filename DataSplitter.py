@@ -6,7 +6,7 @@ from sklearn.ensemble import IsolationForest
 # Create Class
 class DataSplitter:
     '''
-    Splits data into X and Y trains prior to data preprocessing and model ingestion.
+    Contains functions which split and recombine data to prevent data leakage prior to running X and y train and test data through ML models.
     '''
     
     def __init__(self, df: pd.DataFrame(), X: list, y: str, test_size: int):
@@ -17,10 +17,13 @@ class DataSplitter:
     
     def train_test_split(self):
         '''
-        performs a simple train_test_split to the
+        performs a simple train_test_split.
 
         inputs
         test_size: what percent of data should be retained for testing
+
+        returns
+        X_train, X_test, y_train, y_test
         '''
         
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.df[self.X], self.df[self.y], test_size=self.test_size, random_state=0)
@@ -32,6 +35,9 @@ class DataSplitter:
 
         inputs
         test_size: what percent of data should be retained for testing
+
+        returns
+        X_train, X_test, y_train, y_test
         '''
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.df[self.X], pd.get_dummies(self.df[self.y]), test_size=self.test_size, random_state=0)
         return self.X_train, self.X_test, self.y_train, self.y_test
@@ -40,12 +46,15 @@ class DataSplitter:
         '''
         Offers one method of outlier removal during train/test splitting
 
-        inputs
+        Inputs
         contamination: A frac between 0-1, representing the expected outliers to real data ratio
         bootstrap: Change to true if you want to use the bootstrap method
         test_size: what percent of data should be retained for testing
 
-        notes
+        Returns
+        X_train, X_test, y_train, y_test
+
+        Notes
         recommend to perform outlier removal after splitting but during preprocessing for more fine tuned control, perhaps using quantiles or standard deviations.
         '''
 
@@ -71,14 +80,30 @@ class DataSplitter:
         return self.X_train, self.X_test, self.y_train, self.y_test      
 
     def label_and_recombine_train_X_and_y(self):
+        '''
+        Purpose
+        Recombines X_train y_train so that preprocessing steps which reduce rows occur on both datasets
+        Use "resplit_x_and_y_after_preprocessing()" to re-split X_train and y_train prior to running data through ML models.
+
+        Returns
+        df_train
+        '''
+        
         self.df_train = pd.concat([self.X_train, self.y_train], axis=1)
         return self.df_train
 
     def resplit_x_and_y_after_preprocessing(self, df_train: pd.DataFrame()):
         '''
-        - splits train dataset back into x and y parameters after preprocessing.
-        - combining X and Y train occurs to keep rows synced when doing row filtering/removal preprocessing.
-        - X and Y need to be split again prior to running through ML models.
+        Purpose
+        Splits train dataset back into x and y parameters after preprocessing.
+        Combining X and Y train occurs to keep rows synced when doing row filtering/removal preprocessing.
+        X and Y need to be split again prior to running through ML models.
+
+        Inputs
+        df_train: Your training dataset
+
+        Returns
+        X_train, y_train
         '''
         self.X_train = df_train[self.X]
         self.y_train = df_train[self.y]
@@ -86,7 +111,7 @@ class DataSplitter:
     
     def check_shape(self):
         '''
-        checks shape of split data
+        prints shape of X and y train and test data
         '''
         xshape_train=self.X_train.shape
         xshape_test=self.X_test.shape
