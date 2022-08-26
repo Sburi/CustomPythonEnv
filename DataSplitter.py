@@ -65,7 +65,7 @@ class DataSplitter:
         # Split the data into X/y train/test data
         X, y = data[:, :-1], data[:, -1]
         print('X: ', X, '\n', 'y: ', y)
-        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(X, y, test_size=self.test_size, random_state=1)
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(X, y, test_size=self.test_size, random_state=0)
 
         # Set up the Isolation Forest classifier that will detect the outliers
         i_forest = IsolationForest(contamination=contamination, bootstrap=bootstrap)
@@ -79,20 +79,22 @@ class DataSplitter:
 
         return self.X_train, self.X_test, self.y_train, self.y_test      
 
-    def label_and_recombine_train_X_and_y(self):
+    def recombine_X_and_y_for_preprocessing(self):
         '''
         Purpose
-        Recombines X_train y_train so that preprocessing steps which reduce rows occur on both datasets
+        Recombines X and y so that preprocessing steps which reduce rows occur on both datasets
         Use "resplit_x_and_y_after_preprocessing()" to re-split X_train and y_train prior to running data through ML models.
+        Note that you must be careful not to introduce data leakage if any preprocessing is occurring on the test data. So do not filter rows. If applying any mathmatical changes make sure they are using the #s from the train data, etc.
 
         Returns
-        df_train
+        df_train, df_test
         '''
         
         self.df_train = pd.concat([self.X_train, self.y_train], axis=1)
-        return self.df_train
+        self.df_test = pd.concat([self.X_test, self.y_test], axis=1)
+        return self.df_train, self.df_test
 
-    def resplit_x_and_y_after_preprocessing(self, df_train: pd.DataFrame()):
+    def resplit_x_and_y_after_preprocessing(self, df_train: pd.DataFrame(), df_test: pd.DataFrame(), X: list, y: str):
         '''
         Purpose
         Splits train dataset back into x and y parameters after preprocessing.
@@ -101,13 +103,18 @@ class DataSplitter:
 
         Inputs
         df_train: Your training dataset
+        X: A list of predictors. Must be redefined (rather than using self.attribute) since X may change during processing.
+        y: Predicted value. Must be redefined for the same reason as the above reason.
 
         Returns
-        X_train, y_train
+        X_train, X_test, y_train, y_test
         '''
-        self.X_train = df_train[self.X]
-        self.y_train = df_train[self.y]
-        return self.X_train, self.y_train
+
+        self.X_train = df_train[X]
+        self.y_train = df_train[y]
+        self.X_test = df_test[X]
+        self.y_test = df_test[y]
+        return self.X_train, self.X_test, self.y_train, self.y_test
     
     def check_shape(self):
         '''
