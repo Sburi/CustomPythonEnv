@@ -129,5 +129,16 @@ class DataSplitter:
         print(f'X Test Shape: {xshape_test}')
         print(f'Y Test Shape: {yshape_test}')
 
+    def check_contents(self, rows=5):
+        '''
+        prints shape of X and Y train and test sets
+        '''
+
+        print(f'X Train \n {self.X_train.head(rows)} \n')
+        print(f'y Train \n {self.y_train.head(rows)} \n')
+        print(f'X Test \n {self.X_test.head(rows)} \n')
+        print(f'y Test \n {self.y_test.head(rows)} \n')
+
+
 
 
