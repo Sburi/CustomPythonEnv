@@ -1,22 +1,29 @@
+#data handlers
 import numpy as np
 
+#preprocessors
 from sklearn.feature_extraction.text import TfidfVectorizer
 
+#classifiers
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
 
+#ensemble methods
 from sklearn.model_selection import GridSearchCV
 
+#import error handlers
+from sklearn.utils._testing import ignore_warnings
+from sklearn.exceptions import ConvergenceWarning
 
-class GridSearchClassifiers(Columns):
+class GridSearchClassifiers():
     
     def __init__(self, X_train, X_test, y_train, y_test):
         self.X_train = X_train
         self.X_test = X_test
         self.y_train = y_train
         self.y_test = y_test
-        Columns.__init__(self)
+        #Columns.__init__(self)
 
     def run_tfidf_vectorizer(self):
         tfidf = TfidfVectorizer()
