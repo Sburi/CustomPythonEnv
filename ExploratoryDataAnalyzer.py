@@ -17,6 +17,7 @@ class ExploratoryDataAnalyzer:
         self.df = df
         self.target = target
         self.predictors = predictors
+        self.graph_size_medium = (14, 5)
 
     def show_duplicates(self):
         duplicates = self.df[self.df.duplicated()]
@@ -110,8 +111,22 @@ class ExploratoryDataAnalyzer:
             plt.ylabel('Count Blanks')
             plt.show()
 
-    def plot_target_balance(self):
-        _ = sns.countplot(data=self.df, x=self.target, palette='hls')
+    def plot_target_balance(self, graph_size=None):
+        '''
+        purpose
+        plots counts per target classification to show how disproportionate it is
+
+        inputs
+        graph_size: input as tuple (x, y) where x = width, y=height
+        '''
+
+        #set graph size
+        if graph_size==None:
+            graph_size=self.graph_size_medium
+        plt.rcParams["figure.figsize"] = graph_size
+
+        #plot target variable
+        _ = sns.countplot(data=self.df, x=self.target, palette='hls', order=self.df[self.target].value_counts().index)
         plt.title('Prediction Balance')
         plt.show()
 
@@ -123,7 +138,7 @@ class ExploratoryDataAnalyzer:
         mask = np.triu(np.ones_like(corr, dtype=bool))
 
         # Set up the matplotlib figure
-        fig, ax = plt.subplots(figsize=(11, 9))                    # Set figure size
+        fig, ax = plt.subplots(figsize=(11, 9))
 
         # Generate a custom diverging colormap
         cmap = sns.diverging_palette(230, 20, as_cmap=True)
