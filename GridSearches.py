@@ -14,7 +14,7 @@ from sklearn.model_selection import GridSearchCV
 
 #import error handlers
 from sklearn.utils._testing import ignore_warnings
-from sklearn.exceptions import ConvergenceWarning
+from sklearn.exceptions import ConvergenceWarning, DataConversionWarning
 
 class GridSearchClassifiers():
     
@@ -30,10 +30,10 @@ class GridSearchClassifiers():
         self.X_train_tfidf = tfidf.fit_transform(self.X_train)
         self.X_test_tfidf = tfidf.transform(self.X_test)
 
-    @ignore_warnings(category=ConvergenceWarning)
+    @ignore_warnings()
     def run_grid_search_on_logreg(self):
         params = {
-            'max_iter': [50, 100, 500, 1000, 5000],
+            'max_iter': [50, 100, 500],
             'C': np.logspace(-5, 8, 15, 30),
             'solver': ['lbfgs', 'newton-cg', 'liblinear', 'sag'],
             'penalty': ['l2', 'l1', 'elasticnet']}
@@ -47,7 +47,9 @@ class GridSearchClassifiers():
         print('LR best score: ', best_score)
         print('LR best params: ', best_params)
 
-    @ignore_warnings(category=ConvergenceWarning)
+    #@ignore_warnings(category=ConvergenceWarning)
+
+    @ignore_warnings()
     def run_grid_search_on_knn(self):
         params = {
             'n_neighbors': [2, 5, 7, 10],
@@ -64,7 +66,7 @@ class GridSearchClassifiers():
         print('KNN best score: ', best_score)
         print('KNN best params: ', best_params)
 
-    @ignore_warnings(category=ConvergenceWarning)
+    @ignore_warnings()
     def run_grid_search_on_randomforest(self):
         params = {
             'n_estimators': [10, 50, 100, 250, 500],
@@ -86,9 +88,12 @@ class GridSearchClassifiers():
         print('RF best score: ', best_score)
         print('RF best params: ', best_params)
 
+if __name__ == '__main__':
+    #example run
+    #predict = GridSearchClassifiers(X_train, X_test, y_train, y_test)
+    #predict.run_tfidf_vectorizer()
+    #predict.run_grid_search_on_logreg()
+    #predict.run_grid_search_on_knn()
+    #predict.run_grid_search_on_randomforest()
 
-#predict = GridSearchClassifiers(X_train, X_test, y_train, y_test)
-#predict.run_tfidf_vectorizer()
-#predict.run_grid_search_on_logreg()
-#predict.run_grid_search_on_knn()
-#predict.run_grid_search_on_randomforest()
+    print(help(ignore_warnings))
