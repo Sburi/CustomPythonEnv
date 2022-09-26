@@ -171,3 +171,39 @@ class Preprocessor:
             list_of_series = list_of_series + [series]
         
         return list_of_series
+
+    def fill_missing_months(self, date_col: str):
+        '''
+        fills missing months between min and max date with 0 so that a date range becomes continuous.
+
+        reqs:
+        data must be in [Date] [Value] columns, no more no less with current programming.
+
+        Before
+        1/31/22: 10
+        3/31/22: 30
+
+        After
+        1/31/22: 10
+        2/28/22: 0
+        3/31/22: 30
+        '''
+        #get min, max dates
+        min_date = self.df[date_col].min() + pd.tseries.offsets.MonthEnd(-1)
+        max_date = self.df[date_col].max() 
+
+        #create list of dates
+        full_dates = pd.date_range(min_date, max_date, freq='MS').strftime('%Y-%m-%d').tolist()
+        full_dates = pd.to_datetime(full_dates)
+        full_dates = full_dates + pd.tseries.offsets.MonthEnd(1)
+        df_fulldates = pd.DataFrame({'Date': full_dates})
+
+        #merge target df
+        df_combined = df_fulldates.merge(self.df, how='left', left_on='Date', right_on=date_col)
+        if date_col != 'Date':
+            df_combined = df_combined.drop(columns=date_col)
+
+        #fill nans with 0
+        df_combined = df_combined.fillna(0)
+
+        return df_combined
