@@ -173,6 +173,7 @@ class Preprocessor:
         return list_of_series
 
     def fill_missing_months(self, date_col: str):
+
         '''
         fills missing months between min and max date with 0 so that a date range becomes continuous.
 
@@ -207,3 +208,53 @@ class Preprocessor:
         df_combined = df_combined.fillna(0)
 
         return df_combined
+
+    def standardize_column_names(self, verbose=False):
+
+        '''
+        purpose
+        enable columns in dataframe to be accessed via dot notation ergo df.columnname
+        does this by lower casing each column, replacing spaces with underscores, etc
+
+        input
+        dataframe
+
+        output
+        dataframe with accessible column names
+        '''
+
+        current_cols = self.df.columns
+
+        new_cols = []
+        for col in current_cols:
+            new_col = col.lower()
+            new_col = new_col.replace(' ', '_')
+            new_cols.append(new_col)
+
+        self.df.columns = new_cols
+        
+        if verbose==True:
+            print(f'new columns: ', new_cols)
+
+    def add_cumulative_multiple(self, target_cols: list):
+        '''
+        purpose
+        for each column in target_cols, adds a new columns with the target columns cumulative total
+
+        input
+        df
+        target columns
+
+        outputs
+        df
+        target columns
+        cumulative total per target column
+        '''
+
+        for col in target_cols:
+            new_col_name = f'{col}_cumulative'
+            self.df[new_col_name] = self.df[col].cumsum()
+
+
+
+
