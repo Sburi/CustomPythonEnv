@@ -138,7 +138,33 @@ class DataSplitter:
         print(f'y Train \n {self.y_train.head(rows)} \n')
         print(f'X Test \n {self.X_test.head(rows)} \n')
         print(f'y Test \n {self.y_test.head(rows)} \n')
+    
+    def train_test_timeseries_splitter(self):
+        '''
+        purpose
+        splits train and test sets for datetime data
 
+        inputs
+        date column must be continuous (no date gaps) and ordered
 
+        returns
+        indexes_in_train, dftrain, dftest
+        '''
+
+        #get rows for train
+        train_size = 1 - self.test_size
+        total_rows = len(self.df)
+        rows_in_train = int(total_rows*train_size)
+
+        #obtain dftrain
+        dftrain = self.df[:rows_in_train]
+        
+        #obtain dftest
+        indexes_in_train = dftrain.index
+        max_index = len(indexes_in_train)-1
+        indexes_in_train = indexes_in_train.drop(max_index)
+        dftest = self.df.loc[~self.df.index.isin(indexes_in_train)]
+
+        return indexes_in_train, dftrain, dftest
 
 
