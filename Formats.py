@@ -2,7 +2,7 @@ class Formats:
     import locale
     locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
     
-    def currency(number):
+    def currency(self, number):
         try:
             number_rounded = int(round(number))
             number_as_currrency = '${:,.0f}'.format(number_rounded)
