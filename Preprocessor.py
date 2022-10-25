@@ -18,7 +18,7 @@ from sklearn.preprocessing import StandardScaler
 class Preprocessor:
     def __init__(self, df):
         self.df = df
-        Columns.__init__(self)
+        #Columns.__init__(self)
 
     def convert_to_categorical_dtype(self, columns_to_convert: list):
         for col in columns_to_convert:
@@ -65,6 +65,25 @@ class Preprocessor:
         self.df = self.df[self.df[self.col_category].notnull()]
 
     def clean_text_column(self, column_toclean: str, column_new: str):
+        '''
+        cleans and standardizes text column
+
+        inputs
+        column_toclean: the text column you want to clean
+        column_new: the column you want to write the new values to
+
+        outputs
+        self.df where specified text column has been cleaned and standardized
+
+        process
+            removes
+                line breaks
+                punctuations
+                english stop words
+                any additional useless words
+            stems and lemmitzes words
+        '''
+        
         def clean_text(self, text, stem='None'):
             final_string = ''
 
@@ -101,11 +120,33 @@ class Preprocessor:
         self.df[column_new] = self.df[column_toclean].apply(lambda x: clean_text(self, text=x, stem='Stem'))
     
     def scale_data(self, numeric_columns: list):
+        '''
+        Scales data using standard scaler
+
+        inputs
+        numeric_columns: List of numeric columns you want to standardize
+
+        outputs
+        self.df where columns have been standardized
+        '''
         scaler = StandardScaler()
         self.df[numeric_columns] = scaler.fit_transform(self.df[numeric_columns])
       
     def normalize_values_based_on_dict(self, col_to_standardize: str, dictionary_with_conversions: dict, print_conversions=False, revised_col='', classify_nonspecified_as_other=False):
-        '''normalize values based on dict where key = correct, values = list of incorrect instances'''
+        '''
+        normalize values based on dict where key = correct, values = list of incorrect instances
+
+        inputs
+        col_to_standardize: the column you want to standardize
+        revised_col: the column you want to house the new change (if you don't want to overwrite the orig column)
+        dictionary_with_conversions: where the key is the standardized result, and the values are lists of exact non-standard values you want to convert
+        print_conversions: if you want to see what has been converted
+        classify_nonspecified_as_other: list as true if you want to group all non-specified values as other. Leave as false if you want non-specified values to be returned as they originally were.
+        
+        outputs
+        self.df with revisions on specified column
+        
+        '''
 
         # #backup orig
         # dfOrig = df[[col_to_standardize]].copy()
@@ -114,7 +155,7 @@ class Preprocessor:
         if revised_col == '':
             revised_col = col_to_standardize
 
-        #normalize vendors
+        #standardize column
         temp_conversion_col = 'Converted To'
         for k,v in dictionary_with_conversions.items():
             self.df.loc[
