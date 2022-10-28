@@ -10,3 +10,10 @@ class Formats:
             return number_as_currrency
         except ValueError:
             return number
+
+    def percents(self, number):
+        #number = number*100
+        #number = '{0:0%}'.format(number)
+        #number = '{%.0f%%}'.format(number)
+        number = "%.0f%%" % (100 * number)
+        return number
