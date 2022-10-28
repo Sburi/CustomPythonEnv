@@ -161,7 +161,14 @@ class DataSplitter:
         
         #obtain dftest
         indexes_in_train = dftrain.index
-        max_index = len(indexes_in_train)-1
+
+        #print('index mod one: ', indexes_in_train)
+ 
+        max_index = max(indexes_in_train)
+
+        #print('index mod two: ', indexes_in_train)
+        #print('max index: ', max_index)
+
         indexes_in_train = indexes_in_train.drop(max_index)
         dftest = self.df.loc[~self.df.index.isin(indexes_in_train)]
 
