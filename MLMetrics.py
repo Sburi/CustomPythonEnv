@@ -1,11 +1,17 @@
+#data handlers
 import numpy as np
 import pandas as pd
 
-from scipy import stats
-from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, roc_curve, confusion_matrix
-
+#visualizers
 import matplotlib.pyplot as plt
 import seaborn as sns
+
+#custom
+from CustomEnv.Formats import Formats
+
+#error metrics
+from scipy import stats
+from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, roc_curve, confusion_matrix, mean_squared_error
 
 class ClassificationMetrics:
     '''
@@ -83,3 +89,99 @@ class ClassificationMetrics:
         #show scores
         print(f'Baseline ROC AUC: {self.baseline_roc_auc}')
         print(f'ROC AUC Score: {self.actual_roc_auc}')
+
+
+class ForecastingMetrics:
+
+    '''
+    fmetrics = ForecastingMetrics(dftest=sarimax_forecast.dftest, validation_yhat=sarimax_forecast.validation_yhat, model_fit_validation=sarimax_forecast.model_fit_validation)
+    fmetrics.run_pipeline_forecasting_error_metrics(type='money')
+    '''
+
+    def __init__(self, dftest, validation_yhat, model_fit_validation):
+        self.dftest=dftest
+        self.validation_yhat=validation_yhat
+        self.model_fit_validation = model_fit_validation
+
+    def show_summary(self):
+        return print(self.model_fit_validation.summary())
+
+    def calc_mean(self, type=''):
+
+        #obtain mean, as reference point for MSE
+        mean = self.dftest.values.mean()
+        mean = round(mean, 2)
+        self.mean = mean
+
+        #apply formatting
+        if type=='money':
+            frmt = Formats()
+            mean = frmt.currency(mean)
+
+        print(f'Mean: {mean}')
+        
+    def calc_mean_squared_error(self, type=''):
+
+        #obtain MSE
+        mse = mean_squared_error(self.dftest.values, self.validation_yhat, squared=True)
+        mse = round(mse, 2)
+
+        #apply formatting
+        if type=='money':
+            frmt = Formats()
+            mse = frmt.currency(mse)
+
+        #print
+        print(f'Mean Squared Error:  {mse}')
+
+    def calc_root_mean_squared_error(self, type=''):
+        
+        #obtain MSE
+        rmse = mean_squared_error(self.dftest.values, self.validation_yhat, squared=False)
+        rmse = round(rmse, 2)
+        self.rmse = rmse
+
+        #apply formatting
+        if type=='money':
+            frmt = Formats()
+            rmse = frmt.currency(rmse)
+
+        #print
+        print(f'Root Mean Squared Error:  {rmse}')
+
+    def mean_percent_of_rmse(self):
+
+        percent = self.rmse / self.mean
+
+        frmt = Formats()
+        percent = frmt.percents(percent)
+
+        print(f'Mean % of RMSE: {percent}')
+
+    def run_pipeline_forecasting_error_metrics(self, type=''):
+        
+        #self.calc_mean_squared_error(type=type)
+        self.calc_root_mean_squared_error(type=type)
+        self.calc_mean(type=type)
+        self.mean_percent_of_rmse()
+        self.show_summary()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
