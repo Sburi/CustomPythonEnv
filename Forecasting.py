@@ -169,7 +169,7 @@ class FindPDQ:
             return dfresults
 
     @iw.ignore_multiple_warnings([UserWarning, RuntimeWarning])
-    def grid_search_sarima_params(self, max_p: int, max_d: int, max_q: int, maxiter=50, freq='M', freq_num=12):
+    def grid_search_sarima_params(self, max_p: int, max_d: int, max_q: int, maxiter=50, freq='M', freq_num=12, verbose=False):
         
         '''
         Input: 
@@ -202,7 +202,7 @@ class FindPDQ:
         for comb in pdq:
             for combs in pdqs:
                 try:
-                    mod = sm.tsa.statespace.SARIMAX(self.dftrain,
+                    mod = sm.tsa.statespace.SARIMAX(self.dfreduced,
                                                     order=comb,
                                                     seasonal_order=combs,
                                                     enforce_stationarity=False,
@@ -210,13 +210,16 @@ class FindPDQ:
                                                     freq=freq)
 
                     output = mod.fit(maxiter=maxiter) 
-                    ans.append([comb, combs, output.aic, output.bic])
+                    class_input = f'order={str(comb)}, seasonal_order={str(combs)}'
+                    ans.append([comb, combs, output.aic, output.bic, class_input])
                     #print('SARIMAX {} x {}12 : BIC Calculated ={}'.format(comb, combs, output.bic))
                 except:
+                    if verbose:
+                        print(f'the following did not work: {comb}, {combs}')
                     continue
                 
         # Convert into dataframe
-        dfresults = pd.DataFrame(ans, columns=['pdq', 'pdqs', 'aic', 'bic'])
+        dfresults = pd.DataFrame(ans, columns=['pdq', 'pdqs', 'aic', 'bic', 'class input'])
 
         #remove useless results
         def remove_useless(df):
@@ -389,8 +392,7 @@ class SarimaxForecast:
 
         #print
         if verbose:
-            print(f'\n new forecast: \n {self.df_new_forecast.head(2)}') 
-            #print(f'\nModel Fit Summary: \n {self.model_fit_new.summary()}')        
+            print(f'\n new forecast: \n {self.df_new_forecast.head(2)}')      
 
     def join_predictions_with_actuals(self, verbose=False):
         self.df_combined = pd.merge(self.dfreduced, self.df_validation_forecast, how='outer', left_index=True, right_index=True)
@@ -405,9 +407,10 @@ class SarimaxForecast:
         self.join_predictions_with_actuals(verbose=verbose)
 
 class PlotForecast:
-    def __init__(self, forecasting_model, df_newandvalidation_forecasts):
+    def __init__(self, forecasting_model, df_newandvalidation_forecasts, y: str):
         self.model = forecasting_model
         self.df_combined = df_newandvalidation_forecasts
+        self.y = y
 
     def residuals(self):
         
@@ -431,7 +434,7 @@ class PlotForecast:
         print('\nPrediction')
         
         fig, ax = plt.subplots(figsize=(15, 5))
-        chart = sns.lineplot(x=self.df_combined.index, y='sum_all', data=self.df_combined)
+        chart = sns.lineplot(x=self.df_combined.index, y=self.y, data=self.df_combined)
         self.df_combined['Validation Forecast - Mean'].plot(ax=ax, color='red', marker='o', legend=True) 
         self.df_combined['New Forecast - Mean'].plot(ax=ax, color='blue', marker=  'o', legend=True)
 
