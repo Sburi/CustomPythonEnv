@@ -20,6 +20,35 @@ class Preprocessor:
         self.df = df
         #Columns.__init__(self)
 
+    def load_raw_data_if_not_already_loaded(self, path_to_load_from):
+        '''
+        Purpose \n
+        Loading key measures takes too long. This function checks if it is already loaded and if so does not load it again to save dev time.
+
+
+        To Call \n
+        if 'dfraw' not in locals():
+            dfraw = None
+        dfraw = load_raw_data_if_not_already_loaded(path=path_to_file, df=dfraw)
+
+
+        Returns \n
+        dfraw
+        '''
+
+        try:
+            self.df.head()
+            print('data already loaded')
+            return self.df
+        except AttributeError: 
+            print('dfraw is none, loading from path')
+            self.df = pd.read_excel(path_to_load_from)
+            return self.df
+        except NameError:
+            print('dfraw not defined, loading from path')
+            self.df = pd.read_excel(path_to_load_from)
+            return self.df
+
     def convert_to_categorical_dtype(self, columns_to_convert: list):
         for col in columns_to_convert:
             self.df[col] = self.df[col].astype('category')
