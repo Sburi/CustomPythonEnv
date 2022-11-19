@@ -6,7 +6,18 @@ class Standardize:
 
     def standardize_column_values(self, conversion_dict: dict, current_col: str, revised_col='', print_conversions=False):
         '''
-        normalize vendors that show up in disparate ways across datasets
+        Purpose \n
+        Provides system that loops through a dictionary and provided column inputs. If dictionary value is found, value is converted to dictionary key.
+
+        Example \n
+        Given the below dictionary, this method will loop through the current_col looking for the dictionary values 'usrname' and 'uname', if it finds those values, it will convert them to 'Username' in the revised_col. Conversions may also be printed for reference.
+        dict = {
+            'Username' : ['usrname', 'uname'],
+        }
+
+        Output \n
+        Modifies this classes self.df. The sub-calls of this standardizer directly return df for their specific use-cases. If this method is used independently and fed a dictionary, then you can extract the dataframe by obtaining the .df attribute of this class.
+
         '''
     
         #if no revised_col_name has been provided, overwrite the original vendor name with the revised vendor name column
@@ -34,8 +45,15 @@ class Standardize:
 
     def vendors(self, current_col, revised_col, print_conversions=False):
         '''
+        Purpose \n
+        Standardizes vendors.
         
-        returns
+        Inputs \n
+        :current_col: the column with the values you want to standardize
+        :revised_col: the column where you want the new, standardized values to appear. May be the same as the current_col if you're ok with overwriting those values.
+        :print_conversions: Boolean toggling whether or not from-->to conversions are shown.
+
+        Returns
         dataframe
         '''
         conversion_dictionary = {
@@ -75,8 +93,15 @@ class Standardize:
 
     def transaction_classes(self, current_col, revised_col, print_conversions=False):
         '''
+        Purpose \n
+        Standardizes transaction classes.
         
-        returns
+        Inputs \n
+        :current_col: the column with the values you want to standardize
+        :revised_col: the column where you want the new, standardized values to appear. May be the same as the current_col if you're ok with overwriting those values.
+        :print_conversions: Boolean toggling whether or not from-->to conversions are shown.
+
+        Returns
         dataframe
         '''
 
@@ -92,8 +117,15 @@ class Standardize:
 
     def prioritization_categories(self, current_col, revised_col, print_conversions=False):
         '''
+        Purpose \n
+        Standardizes prioritization categories.
         
-        returns
+        Inputs \n
+        :current_col: the column with the values you want to standardize
+        :revised_col: the column where you want the new, standardized values to appear. May be the same as the current_col if you're ok with overwriting those values.
+        :print_conversions: Boolean toggling whether or not from-->to conversions are shown.
+
+        Returns
         dataframe
         '''
 
@@ -109,8 +141,15 @@ class Standardize:
 
     def funding_portfolio(self, current_col, revised_col, print_conversions=False):
         '''
+        Purpose \n
+        Standardizes funding portfolio.
         
-        returns
+        Inputs \n
+        :current_col: the column with the values you want to standardize
+        :revised_col: the column where you want the new, standardized values to appear. May be the same as the current_col if you're ok with overwriting those values.
+        :print_conversions: Boolean toggling whether or not from-->to conversions are shown.
+
+        Returns
         dataframe
         '''
 
@@ -142,8 +181,15 @@ class Standardize:
 
     def template(self, current_col, revised_col, print_conversions=False):
         '''
+        Purpose \n
+        Standardizes ___.
         
-        returns
+        Inputs \n
+        :current_col: the column with the values you want to standardize
+        :revised_col: the column where you want the new, standardized values to appear. May be the same as the current_col if you're ok with overwriting those values.
+        :print_conversions: Boolean toggling whether or not from-->to conversions are shown.
+
+        Returns
         dataframe
         '''
 
