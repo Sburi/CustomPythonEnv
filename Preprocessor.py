@@ -325,6 +325,3 @@ class Preprocessor:
             new_col_name = f'{col}_cumulative'
             self.df[new_col_name] = self.df[col].cumsum()
 
-
-
-
