@@ -41,9 +41,16 @@ class ExploratoryDataAnalyzer:
         return dfProportion
 
     def show_target_grouping_statistics(self):
-        means = self.df.groupby(self.target).mean()
-        medians = self.df.groupby(self.target).median()
-        return means, medians
+        '''
+        Purpose \n
+        Shows means, medians grouped by the target predictor.
+        '''
+        
+        means = self.df.groupby(self.target).mean().round(0).reset_index(drop=True)
+        medians = self.df.groupby(self.target).median().reset_index(drop=True)
+
+        print(f'mean stats: \n {means} \n')
+        print(f'median stats: \n {medians} \n')
 
     def plot_distribution(self, of_columns: list):
         for col in of_columns:
@@ -131,6 +138,17 @@ class ExploratoryDataAnalyzer:
         plt.show()
 
     def plot_correlation_matrix(self):
+        '''
+        Purpose
+            Plots correlation matrix to show correlative power of each numeric column against all other numeric columns.
+
+        Inputs
+            None
+
+        Outputs
+            Correlation Plot
+        '''
+        
         # Compute the correlation matrix
         corr = self.df.corr(method = 'pearson')
 
