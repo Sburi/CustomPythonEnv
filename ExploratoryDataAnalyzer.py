@@ -20,12 +20,39 @@ class ExploratoryDataAnalyzer:
         self.graph_size_medium = (14, 5)
 
     def show_duplicates(self):
+        '''
+        Purpose
+        -----------
+            Shows any duplicate rows
+
+        Parameters
+        -----------
+            None
+
+        Outputs
+        -----------
+            A dataframe with any duplicate rows.
+        '''
+        
         duplicates = self.df[self.df.duplicated()]
         return duplicates
     
-    def show_proportions(self, df, col: str, verbose=False):
+    def show_proportions(self, col: str, verbose=False) -> pd.DataFrame:
         '''
-        shows proportion (percent and cumulative percent) for selected dataframe and column
+        Purpose
+        -----------
+            Shows proportion (percent and cumulative percent) for selected dataframe and column
+
+        Parameters
+        -----------
+            col: str
+                The column you want to show the proportions of.
+            verbose: boolean
+                Whether or not you want to print the proportions (in addition to returning them)
+
+        Outputs
+        -----------
+            A dataframe with counts, percents, and cumulative percents for the given target column.
         '''
         
         dfProportion = pd.DataFrame()
@@ -42,8 +69,17 @@ class ExploratoryDataAnalyzer:
 
     def show_target_grouping_statistics(self):
         '''
-        Purpose \n
-        Shows means, medians grouped by the target predictor.
+        Purpose
+        -----------
+            Shows means, medians grouped by the target predictor.
+
+        Parameters
+        -----------
+            None
+
+        Outputs
+        -----------
+            Prints dataframes grouped by target predictor with mean and median statistics.
         '''
         
         means = self.df.groupby(self.target).mean().round(0).reset_index(drop=True)
@@ -53,6 +89,21 @@ class ExploratoryDataAnalyzer:
         print(f'median stats: \n {medians} \n')
 
     def plot_distribution(self, of_columns: list):
+        '''
+        Purpose
+        -----------
+            Plots distributions of selected columns, as well as their skew, kurtosis, mean, median, and mode.
+
+        Parameters
+        -----------
+            of_columns: list
+                Any column you'd like to see a distribution for.
+
+        Outputs
+        -----------
+            Bar plot of distributions of selected columns.
+        '''
+        
         for col in of_columns:
             #create plot of distributions for each columns
             sns.histplot(data=self.df, x=col, bins=100)
@@ -120,11 +171,17 @@ class ExploratoryDataAnalyzer:
 
     def plot_target_balance(self, graph_size=None):
         '''
-        purpose
-        plots counts per target classification to show how disproportionate it is
+        Purpose
+        -----------
+            Plots counts per target classification to show how disproportionate it is
 
-        inputs
-        graph_size: input as tuple (x, y) where x = width, y=height
+        Inputs
+        -----------
+            Graph_size: input as tuple (x, y) where x = width, y=height. Defaults to medium.
+
+        Outputs
+        -----------
+            Bar graph with target balances. For ex: given a target of survival, 10 survived, 1 did not, so target variable is disproportionately weighted towards survival.
         '''
 
         #set graph size
@@ -140,12 +197,15 @@ class ExploratoryDataAnalyzer:
     def plot_correlation_matrix(self):
         '''
         Purpose
+        -----------
             Plots correlation matrix to show correlative power of each numeric column against all other numeric columns.
 
         Inputs
+        -----------
             None
 
         Outputs
+        -----------
             Correlation Plot
         '''
         
@@ -181,6 +241,27 @@ class ExploratoryDataAnalyzer:
         plt.show()
 
     def plot_n_lowest_and_highest_category_against_target(self, category: str, n: int):
+        '''
+        Purpose
+        -----------
+            Show the top and bottom n categories in terms of their variance on the target variable. For example, given survival as the target and age as the category, show the top 5 ages that survived more than died and the bottom 5 ages that died more than survived.
+
+        Parameters
+        -----------
+            n: The number of lowest and highest variances you'd like to see per graph. For ex: n=5 will show top 5 and bottom 5 variances per graph.
+
+        Limitations
+        -----------
+            Only works with binary predictors.
+
+        Future Builds
+        -----------
+            Build to work >2 predictors.
+
+        Outputs
+        -----------
+            Two bar graphs. One with top 5 
+        '''
         ct_scorevscategory = pd.crosstab(self.df[category], self.df[self.target]).reset_index().set_index(category)
 
         ct_scorevscategory['variance'] = ct_scorevscategory[1] - ct_scorevscategory[0]
@@ -190,7 +271,7 @@ class ExploratoryDataAnalyzer:
         def plot_bar_graph(df, title: str, n: int):
             _ = df.head(n).plot(kind='bar')
             _ = plt.rcParams["figure.figsize"] = (10, 10)
-            _ = plt.title('{} {} Desirable Categories'.format(n, title), size=35)
+            _ = plt.title(f'Top {n} for {title} predictor', size=35)
             _ = plt.ylabel('Count', size=18)
             _ = plt.xlabel('Category', size=20)
             _ = plt.xticks(rotation=45, size=20)
@@ -199,8 +280,8 @@ class ExploratoryDataAnalyzer:
             _ = plt.clf()
             _ = plt.close()
 
-        plot_bar_graph(most_popular, title='Most', n=n)
-        plot_bar_graph(most_unpopular, title='Least', n=n)
+        plot_bar_graph(most_popular, title='First', n=n)
+        plot_bar_graph(most_unpopular, title='Second', n=n)
 
     def multi_ecdf(self, series_to_compute: list, title: str, xlabel: str, legend_title: str):
         for series in series_to_compute:
