@@ -12,8 +12,6 @@ class Standardize:
             The dataframe with columns you want to convert
         print_conversions: boolean
             If true, prints from-->to conversions for review.
-
-
     '''
     
     def __init__(self, df: pd.DataFrame, print_conversions: bool):
@@ -139,13 +137,6 @@ class Standardize:
                 The column where non-standard values reside.
             revised_col: str
                 The column where you want standardized values to be placed. If this is left blank, the standardized values will be placed in the current_col.
-        
-        Example
-        ----------
-            Given the below dictionary, this method will loop through the current_col looking for the dictionary values 'usrname' and 'uname', if it finds those values, it will convert them to 'Username' in the revised_col. Conversions may also be printed for reference.
-        dict = {
-            'Username' : ['usrname', 'uname'],
-        }
 
         Output
         ----------
@@ -206,13 +197,6 @@ class Standardize:
                 The column where non-standard values reside.
             revised_col: str
                 The column where you want standardized values to be placed. If this is left blank, the standardized values will be placed in the current_col.
-        
-        Example
-        ----------
-            Given the below dictionary, this method will loop through the current_col looking for the dictionary values 'usrname' and 'uname', if it finds those values, it will convert them to 'Username' in the revised_col. Conversions may also be printed for reference.
-            dict = {
-                'Username' : ['usrname', 'uname'],
-            }
 
         Output
         ----------
