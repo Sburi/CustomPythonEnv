@@ -16,6 +16,21 @@ from sklearn.preprocessing import StandardScaler
 #         self.col_name = col_name
 
 class Preprocessor:
+    '''
+    Purpose
+    ----------
+        Houses preprocessing functions for single dataframe.
+
+    Parameters
+    ----------
+        df: dataframe
+            The dataframe you want to run preprocessing on.
+
+    Output
+    ----------
+        Modifies this classes self.df. After preprocessing complete, extract using "df = class_instance.df".
+    '''
+    
     def __init__(self, df):
         self.df = df
         #Columns.__init__(self)

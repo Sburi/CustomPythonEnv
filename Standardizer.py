@@ -1,23 +1,48 @@
+import pandas as pd
 
 class Standardize:
+    '''
+    Purpose
+    ----------
+        Used to standardize values across disparate files. Houses both an extensible method which can be used for one-offs, as well as utilizations of that method for common standardizations such as transaction class simplifications.
 
-    def __init__(self, df):
+    Inputs
+    ----------
+        df: Dataframe
+            The dataframe with columns you want to convert
+        print_conversions: boolean
+            If true, prints from-->to conversions for review.
+    '''
+    
+    def __init__(self, df: pd.DataFrame, print_conversions: bool):
         self.df = df
+        self.print_conversions = print_conversions
 
-    def standardize_column_values(self, conversion_dict: dict, current_col: str, revised_col='', print_conversions=False):
+    def standardize_column_values(self, conversion_dict: dict, current_col: str, revised_col=''):
         '''
-        Purpose \n
-        Provides system that loops through a dictionary and provided column inputs. If dictionary value is found, value is converted to dictionary key.
+        Purpose
+        ----------
+            Provides system that loops through a dictionary and provided column inputs. If dictionary value is found, value is converted to dictionary key.
 
-        Example \n
-        Given the below dictionary, this method will loop through the current_col looking for the dictionary values 'usrname' and 'uname', if it finds those values, it will convert them to 'Username' in the revised_col. Conversions may also be printed for reference.
-        dict = {
-            'Username' : ['usrname', 'uname'],
-        }
+        Parameters
+        ----------
+            conversion_dict: dict
+                A dictionary where the keys are the standardized values and the values are lists of non-standard ways that the standardized value may occur.
+            current_col: str
+                The column where non-standard values reside.
+            revised_col: str
+                The column where you want standardized values to be placed. If this is left blank, the standardized values will be placed in the current_col.
+        
+        Example
+        ----------
+            Given the below dictionary, this method will loop through the current_col looking for the dictionary values 'usrname' and 'uname', if it finds those values, it will convert them to 'Username' in the revised_col. Conversions may also be printed for reference.
+            dict = {
+                'Username' : ['usrname', 'uname'],
+            }
 
-        Output \n
-        Modifies this classes self.df. The sub-calls of this standardizer directly return df for their specific use-cases. If this method is used independently and fed a dictionary, then you can extract the dataframe by obtaining the .df attribute of this class.
-
+        Output
+        ----------
+            Modifies this classes self.df. The sub-calls of this standardizer directly return df for their specific use-cases. If this method is used independently and fed a dictionary, then you can extract the dataframe by obtaining the .df attribute of this class.
         '''
     
         #if no revised_col_name has been provided, overwrite the original vendor name with the revised vendor name column
@@ -25,7 +50,7 @@ class Standardize:
             revised_col = current_col
 
         #normalize vendors
-        temp_conversion_col = 'Converted To'
+        temp_conversion_col = '<><>Converted To'
         for k,v in conversion_dict.items():
             self.df.loc[
                 self.df[current_col].str.lower().isin([i.lower() for i in v]),
@@ -33,28 +58,36 @@ class Standardize:
         self.df[temp_conversion_col] = self.df[temp_conversion_col].fillna(self.df[current_col])
 
         #print changes
-        if print_conversions:
-            conversions =  self.df.where(self.df[current_col] != self.df[temp_conversion_col])[[current_col, temp_conversion_col]]#
+        col_conversion_occured = '<><>Conversion Occured?'
+        self.df[col_conversion_occured] = self.df[current_col] != self.df[temp_conversion_col]
+        conversions = self.df[self.df[col_conversion_occured]==True]
+        if self.print_conversions and len(conversions)!=0:
             conversions.rename(columns={current_col:'Original Entry'}, inplace=True)
-            print('conversions:')
-            print(conversions.drop_duplicates().dropna().sort_values('Converted To'))
+            conversions = conversions.drop_duplicates().dropna().sort_values('Converted To')
+            print(f'conversions \n {conversions}')
 
         #implement change
         self.df[revised_col] = self.df[temp_conversion_col]
-        self.df = self.df.drop(temp_conversion_col, axis=1)
+        self.df = self.df.drop(columns=[temp_conversion_col, col_conversion_occured])
 
-    def vendors(self, current_col, revised_col, print_conversions=False):
+    def vendors(self, current_col, revised_col):
         '''
-        Purpose \n
-        Standardizes vendors.
-        
-        Inputs \n
-        :current_col: the column with the values you want to standardize
-        :revised_col: the column where you want the new, standardized values to appear. May be the same as the current_col if you're ok with overwriting those values.
-        :print_conversions: Boolean toggling whether or not from-->to conversions are shown.
+        Purpose
+        ----------
+            Standardizes vendors.
 
-        Returns
-        dataframe
+        Parameters
+        ----------
+            conversion_dict: dict
+                A dictionary where the keys are the standardized values and the values are lists of non-standard ways that the standardized value may occur.
+            current_col: str
+                The column where non-standard values reside.
+            revised_col: str
+                The column where you want standardized values to be placed. If this is left blank, the standardized values will be placed in the current_col.
+
+        Output
+        ----------
+           Dataframe
         '''
         conversion_dictionary = {
             'ActiveOps': ['Activeops USA', 'Activeops Usa Inc.'],
@@ -88,21 +121,27 @@ class Standardize:
             'World Wide Technologies': ['Wwt'],
         }
 
-        self.standardize_column_values(conversion_dict=conversion_dictionary, current_col=current_col, revised_col=revised_col, print_conversions=print_conversions)
+        self.standardize_column_values(conversion_dict=conversion_dictionary, current_col=current_col, revised_col=revised_col)
         return self.df
 
-    def transaction_classes(self, current_col, revised_col, print_conversions=False):
+    def transaction_classes(self, current_col, revised_col):
         '''
-        Purpose \n
-        Standardizes transaction classes.
-        
-        Inputs \n
-        :current_col: the column with the values you want to standardize
-        :revised_col: the column where you want the new, standardized values to appear. May be the same as the current_col if you're ok with overwriting those values.
-        :print_conversions: Boolean toggling whether or not from-->to conversions are shown.
+        Purpose
+        ----------
+            Standardizes transaction classes.
 
-        Returns
-        dataframe
+        Parameters
+        ----------
+            conversion_dict: dict
+                A dictionary where the keys are the standardized values and the values are lists of non-standard ways that the standardized value may occur.
+            current_col: str
+                The column where non-standard values reside.
+            revised_col: str
+                The column where you want standardized values to be placed. If this is left blank, the standardized values will be placed in the current_col.
+
+        Output
+        ----------
+           Dataframe
         '''
 
         conversion_dictionary = {
@@ -112,21 +151,27 @@ class Standardize:
             'Direct Labor': ['Direct Labor', 'Software Development (Labor)'],
         }
 
-        self.standardize_column_values(conversion_dict=conversion_dictionary, current_col=current_col, revised_col=revised_col, print_conversions=print_conversions)
+        self.standardize_column_values(conversion_dict=conversion_dictionary, current_col=current_col, revised_col=revised_col)
         return self.df
 
-    def prioritization_categories(self, current_col, revised_col, print_conversions=False):
+    def prioritization_categories(self, current_col, revised_col):
         '''
-        Purpose \n
-        Standardizes prioritization categories.
-        
-        Inputs \n
-        :current_col: the column with the values you want to standardize
-        :revised_col: the column where you want the new, standardized values to appear. May be the same as the current_col if you're ok with overwriting those values.
-        :print_conversions: Boolean toggling whether or not from-->to conversions are shown.
+        Purpose
+        ----------
+            Standardizes prioritization categories (i.e. objective, abo, run).
 
-        Returns
-        dataframe
+        Parameters
+        ----------
+            conversion_dict: dict
+                A dictionary where the keys are the standardized values and the values are lists of non-standard ways that the standardized value may occur.
+            current_col: str
+                The column where non-standard values reside.
+            revised_col: str
+                The column where you want standardized values to be placed. If this is left blank, the standardized values will be placed in the current_col.
+
+        Output
+        ----------
+           Dataframe
         '''
 
         conversion_dictionary = {
@@ -136,21 +181,27 @@ class Standardize:
             'RUN': ['RUN'],
         }
 
-        self.standardize_column_values(conversion_dict=conversion_dictionary, current_col=current_col, revised_col=revised_col, print_conversions=print_conversions)
+        self.standardize_column_values(conversion_dict=conversion_dictionary, current_col=current_col, revised_col=revised_col)
         return self.df   
 
-    def funding_portfolio(self, current_col, revised_col, print_conversions=False):
+    def funding_portfolio(self, current_col, revised_col):
         '''
-        Purpose \n
-        Standardizes funding portfolio.
-        
-        Inputs \n
-        :current_col: the column with the values you want to standardize
-        :revised_col: the column where you want the new, standardized values to appear. May be the same as the current_col if you're ok with overwriting those values.
-        :print_conversions: Boolean toggling whether or not from-->to conversions are shown.
+        Purpose
+        ----------
+            Standardizes funding portfolios (i.e. CECP, etc).
 
-        Returns
-        dataframe
+        Parameters
+        ----------
+            conversion_dict: dict
+                A dictionary where the keys are the standardized values and the values are lists of non-standard ways that the standardized value may occur.
+            current_col: str
+                The column where non-standard values reside.
+            revised_col: str
+                The column where you want standardized values to be placed. If this is left blank, the standardized values will be placed in the current_col.
+
+        Output
+        ----------
+           Dataframe
         '''
 
         conversion_dictionary = {
@@ -176,21 +227,27 @@ class Standardize:
             'Workforce Management (Grow DIHE)': ['?'],
         }
 
-        self.standardize_column_values(conversion_dict=conversion_dictionary, current_col=current_col, revised_col=revised_col, print_conversions=print_conversions)
+        self.standardize_column_values(conversion_dict=conversion_dictionary, current_col=current_col, revised_col=revised_col)
         return self.df   
 
-    def template(self, current_col, revised_col, print_conversions=False):
+    def template(self, current_col, revised_col):
         '''
-        Purpose \n
-        Standardizes ___.
-        
-        Inputs \n
-        :current_col: the column with the values you want to standardize
-        :revised_col: the column where you want the new, standardized values to appear. May be the same as the current_col if you're ok with overwriting those values.
-        :print_conversions: Boolean toggling whether or not from-->to conversions are shown.
+        Purpose
+        ----------
+            Standardizes ___.
 
-        Returns
-        dataframe
+        Parameters
+        ----------
+            conversion_dict: dict
+                A dictionary where the keys are the standardized values and the values are lists of non-standard ways that the standardized value may occur.
+            current_col: str
+                The column where non-standard values reside.
+            revised_col: str
+                The column where you want standardized values to be placed. If this is left blank, the standardized values will be placed in the current_col.
+
+        Output
+        ----------
+           Dataframe
         '''
 
         conversion_dictionary = {
@@ -200,7 +257,7 @@ class Standardize:
             '': [''],
         }
 
-        self.standardize_column_values(conversion_dict=conversion_dictionary, current_col=current_col, revised_col=revised_col, print_conversions=print_conversions)
+        self.standardize_column_values(conversion_dict=conversion_dictionary, current_col=current_col, revised_col=revised_col)
         return self.df   
 
 if __name__ == '__main__':
@@ -209,3 +266,13 @@ if __name__ == '__main__':
         dfTest = pd.DataFrame()
         dfTest['Vendor Name'] = ['Wwt', 'Verint', 'Nuance Communicatio', 'Nuance Communications, Inc.', 'Intradiem Inc', 'Intradiem Inc', 'Enclara Budget', 'Mattersight Corporation']
         #test = test_simplify_vendors(dfTest, vendor_col='Vendor Name', print_conversions=True)
+
+    def test_simplify_no_results():
+        dftest = pd.DataFrame({
+            'Prioritization Category': ['Objective', 'Objective', 'ABO', 'ABO']
+        }) 
+        
+        standardizer = Standardize(df=dftest, print_conversions=True)
+        standardizer.prioritization_categories(current_col='Prioritization Category', revised_col='Priorization Category')
+
+    test_simplify_no_results()
