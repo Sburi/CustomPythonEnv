@@ -43,7 +43,6 @@ class Standardize:
         Output
         ----------
             Modifies this classes self.df. The sub-calls of this standardizer directly return df for their specific use-cases. If this method is used independently and fed a dictionary, then you can extract the dataframe by obtaining the .df attribute of this class.
-
         '''
     
         #if no revised_col_name has been provided, overwrite the original vendor name with the revised vendor name column
@@ -120,7 +119,7 @@ class Standardize:
             'World Wide Technologies': ['Wwt'],
         }
 
-        self.standardize_column_values(conversion_dict=conversion_dictionary, current_col=current_col, revised_col=revised_col, print_conversions=self.print_conversions)
+        self.standardize_column_values(conversion_dict=conversion_dictionary, current_col=current_col, revised_col=revised_col)
         return self.df
 
     def transaction_classes(self, current_col, revised_col):
@@ -150,7 +149,7 @@ class Standardize:
             'Direct Labor': ['Direct Labor', 'Software Development (Labor)'],
         }
 
-        self.standardize_column_values(conversion_dict=conversion_dictionary, current_col=current_col, revised_col=revised_col, print_conversions=self.print_conversions)
+        self.standardize_column_values(conversion_dict=conversion_dictionary, current_col=current_col, revised_col=revised_col)
         return self.df
 
     def prioritization_categories(self, current_col, revised_col):
@@ -180,7 +179,7 @@ class Standardize:
             'RUN': ['RUN'],
         }
 
-        self.standardize_column_values(conversion_dict=conversion_dictionary, current_col=current_col, revised_col=revised_col, print_conversions=self.print_conversions)
+        self.standardize_column_values(conversion_dict=conversion_dictionary, current_col=current_col, revised_col=revised_col)
         return self.df   
 
     def funding_portfolio(self, current_col, revised_col):
@@ -226,7 +225,7 @@ class Standardize:
             'Workforce Management (Grow DIHE)': ['?'],
         }
 
-        self.standardize_column_values(conversion_dict=conversion_dictionary, current_col=current_col, revised_col=revised_col, print_conversions=self.print_conversions)
+        self.standardize_column_values(conversion_dict=conversion_dictionary, current_col=current_col, revised_col=revised_col)
         return self.df   
 
     def template(self, current_col, revised_col):
@@ -256,7 +255,7 @@ class Standardize:
             '': [''],
         }
 
-        self.standardize_column_values(conversion_dict=conversion_dictionary, current_col=current_col, revised_col=revised_col, print_conversions=self.print_conversions)
+        self.standardize_column_values(conversion_dict=conversion_dictionary, current_col=current_col, revised_col=revised_col)
         return self.df   
 
 if __name__ == '__main__':
