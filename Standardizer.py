@@ -50,7 +50,7 @@ class Standardize:
             revised_col = current_col
 
         #normalize vendors
-        temp_conversion_col = 'Converted To'
+        temp_conversion_col = '<><>Converted To'
         for k,v in conversion_dict.items():
             self.df.loc[
                 self.df[current_col].str.lower().isin([i.lower() for i in v]),
@@ -58,15 +58,17 @@ class Standardize:
         self.df[temp_conversion_col] = self.df[temp_conversion_col].fillna(self.df[current_col])
 
         #print changes
-        if self.print_conversions:
-            conversions =  self.df.where(self.df[current_col] != self.df[temp_conversion_col])[[current_col, temp_conversion_col]]#
+        col_conversion_occured = '<><>Conversion Occured?'
+        self.df[col_conversion_occured] = self.df[current_col] != self.df[temp_conversion_col]
+        conversions = self.df[self.df[col_conversion_occured]==True]
+        if self.print_conversions and len(conversions)!=0:
             conversions.rename(columns={current_col:'Original Entry'}, inplace=True)
-            print('conversions:')
-            print(conversions.drop_duplicates().dropna().sort_values('Converted To'))
+            conversions = conversions.drop_duplicates().dropna().sort_values('Converted To')
+            print(f'conversions \n {conversions}')
 
         #implement change
         self.df[revised_col] = self.df[temp_conversion_col]
-        self.df = self.df.drop(temp_conversion_col, axis=1)
+        self.df = self.df.drop(columns=[temp_conversion_col, col_conversion_occured])
 
     def vendors(self, current_col, revised_col):
         '''
@@ -264,3 +266,13 @@ if __name__ == '__main__':
         dfTest = pd.DataFrame()
         dfTest['Vendor Name'] = ['Wwt', 'Verint', 'Nuance Communicatio', 'Nuance Communications, Inc.', 'Intradiem Inc', 'Intradiem Inc', 'Enclara Budget', 'Mattersight Corporation']
         #test = test_simplify_vendors(dfTest, vendor_col='Vendor Name', print_conversions=True)
+
+    def test_simplify_no_results():
+        dftest = pd.DataFrame({
+            'Prioritization Category': ['Objective', 'Objective', 'ABO', 'ABO']
+        }) 
+        
+        standardizer = Standardize(df=dftest, print_conversions=True)
+        standardizer.prioritization_categories(current_col='Prioritization Category', revised_col='Priorization Category')
+
+    test_simplify_no_results()
