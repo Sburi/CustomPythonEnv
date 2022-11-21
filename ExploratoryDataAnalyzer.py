@@ -155,7 +155,19 @@ class ExploratoryDataAnalyzer:
             plt.close()
 
     def plot_blanks_per_column(self):
+        '''
+        Purpose
+        -----------
+            Plots blanks per column
 
+        Parameters
+        -----------
+            None
+
+        Outputs
+        -----------
+            Bar graph showing blank counts per column
+        '''
         df_blanks = self.df.isnull().sum().rename('Count')
         df_blanks = df_blanks.reset_index()
         df_blanks = df_blanks[df_blanks['Count']>0]
@@ -262,6 +274,7 @@ class ExploratoryDataAnalyzer:
         -----------
             Two bar graphs. One with top 5 
         '''
+        
         ct_scorevscategory = pd.crosstab(self.df[category], self.df[self.target]).reset_index().set_index(category)
 
         ct_scorevscategory['variance'] = ct_scorevscategory[1] - ct_scorevscategory[0]
