@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 class Standardize:
@@ -50,25 +51,34 @@ class Standardize:
             revised_col = current_col
 
         #normalize vendors
-        temp_conversion_col = '<><>Converted To'
+        temp_conversion_col = '>Converted To<'
         for k,v in conversion_dict.items():
             self.df.loc[
                 self.df[current_col].str.lower().isin([i.lower() for i in v]),
             temp_conversion_col] = k
         self.df[temp_conversion_col] = self.df[temp_conversion_col].fillna(self.df[current_col])
 
-        #print changes
-        col_conversion_occured = '<><>Conversion Occured?'
-        self.df[col_conversion_occured] = self.df[current_col] != self.df[temp_conversion_col]
-        conversions = self.df[self.df[col_conversion_occured]==True]
-        if self.print_conversions and len(conversions)!=0:
-            conversions.rename(columns={current_col:'Original Entry'}, inplace=True)
-            conversions = conversions.drop_duplicates().dropna().sort_values('Converted To')
-            print(f'conversions \n {conversions}')
+        #find out if conversion occurred
+        col_conversion_occurred = '>Conversion Occurred?<'
+        change_occured = (self.df[current_col] != self.df[temp_conversion_col])
+        results_not_nans = (self.df[current_col].notna() & self.df[temp_conversion_col].notna())
+        self.df[col_conversion_occurred] = change_occured & (results_not_nans)
+        dfconversions = self.df[self.df[col_conversion_occurred]==True][[current_col, temp_conversion_col, col_conversion_occurred]]
 
-        #implement change
+        #if no conversions
+        if self.print_conversions and dfconversions.empty:
+            print('\nNo conversions needed')
+        
+        #if conversions
+        if self.print_conversions and not dfconversions.empty:
+            dfconversions = dfconversions.rename(columns={current_col:'Original Entry'})
+            dfconversions = dfconversions.drop_duplicates().dropna().sort_values(col_conversion_occurred)
+            dfconversions = dfconversions.drop(columns=[col_conversion_occurred])
+            print(f'\nConversions \n {dfconversions}')
+
+        #implement change and clean columns
         self.df[revised_col] = self.df[temp_conversion_col]
-        self.df = self.df.drop(columns=[temp_conversion_col, col_conversion_occured])
+        self.df = self.df.drop(columns=[temp_conversion_col])
 
     def vendors(self, current_col, revised_col):
         '''
@@ -262,17 +272,23 @@ class Standardize:
 
 if __name__ == '__main__':
 
-    def test_simplify_vendors():
-        dfTest = pd.DataFrame()
-        dfTest['Vendor Name'] = ['Wwt', 'Verint', 'Nuance Communicatio', 'Nuance Communications, Inc.', 'Intradiem Inc', 'Intradiem Inc', 'Enclara Budget', 'Mattersight Corporation']
-        #test = test_simplify_vendors(dfTest, vendor_col='Vendor Name', print_conversions=True)
-
     def test_simplify_no_results():
         dftest = pd.DataFrame({
-            'Prioritization Category': ['Objective', 'Objective', 'ABO', 'ABO']
+            'Prioritization Category': ['Objective', 'Objective', 'ABO', 'ABO', np.nan, 'NaN'],
+            'Another Column': [1, 2, 'three', 'four', 5, 6.5],
         }) 
         
         standardizer = Standardize(df=dftest, print_conversions=True)
         standardizer.prioritization_categories(current_col='Prioritization Category', revised_col='Priorization Category')
 
+    def test_simplify_with_results():
+        dftest = pd.DataFrame({
+            'Vendor': ['Activeops USA', 'Activeops Usa Inc.', 'ActiveOps']
+        }) 
+        
+
+        standardizer = Standardize(df=dftest, print_conversions=True)
+        standardizer.vendors(current_col='Vendor', revised_col='Vendor')
+
     test_simplify_no_results()
+    test_simplify_with_results()
