@@ -240,6 +240,44 @@ class Standardize:
         self.standardize_column_values(conversion_dict=conversion_dictionary, current_col=current_col, revised_col=revised_col)
         return self.df   
 
+    def months(self, current_col, revised_col):
+        '''
+        Purpose
+        ----------
+            Standardizes months.
+
+        Parameters
+        ----------
+            conversion_dict: dict
+                A dictionary where the keys are the standardized values and the values are lists of non-standard ways that the standardized value may occur.
+            current_col: str
+                The column where non-standard values reside.
+            revised_col: str
+                The column where you want standardized values to be placed. If this is left blank, the standardized values will be placed in the current_col.
+
+        Output
+        ----------
+           Dataframe
+        '''
+
+        conversion_dictionary = {
+            'January': ['M01', 'Jan'],
+            'February': ['M02', 'Feb'],
+            'March': ['M03', 'Mar'],
+            'April': ['M04', 'Apr'],
+            'May': ['M05', 'May'],
+            'June': ['M06', 'Jun'],
+            'July': ['M07', 'Jul'],
+            'August': ['M08', 'Aug'],
+            'September': ['M09', 'Sep'],
+            'October': ['M10', 'Oct'],
+            'November': ['M11', 'Nov'],
+            'December': ['M12', 'Dec']
+        }
+
+        self.standardize_column_values(conversion_dict=conversion_dictionary, current_col=current_col, revised_col=revised_col)
+        return self.df
+     
     def template(self, current_col, revised_col):
         '''
         Purpose
