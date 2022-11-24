@@ -53,7 +53,7 @@ class Standardize:
         temp_conversion_col = '>Converted To<'
         for k,v in conversion_dict.items():
             self.df.loc[
-                self.df[current_col].str.lower().isin([i.lower() for i in v]),
+                self.df[current_col].astype('str').str.lower().isin([i.lower() for i in v]),
             temp_conversion_col] = k
         self.df[temp_conversion_col] = self.df[temp_conversion_col].fillna(self.df[current_col])
 
@@ -77,7 +77,7 @@ class Standardize:
 
         #implement change and clean columns
         self.df[revised_col] = self.df[temp_conversion_col]
-        self.df = self.df.drop(columns=[temp_conversion_col])
+        self.df = self.df.drop(columns=[temp_conversion_col, col_conversion_occurred])
 
     def vendors(self, current_col, revised_col):
         '''
