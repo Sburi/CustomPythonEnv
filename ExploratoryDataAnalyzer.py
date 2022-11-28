@@ -55,9 +55,10 @@ class ExploratoryDataAnalyzer:
             A dataframe with counts, percents, and cumulative percents for the given target column.
         '''
         
+        self.df.style.set_precision(0)
         dfProportion = pd.DataFrame()
         dfProportion['Count'] = self.df[col].value_counts(normalize=False)
-        dfProportion['Percent'] = self.df[col].value_counts(normalize=True)
+        dfProportion['Percent'] = self.df[col].value_counts(normalize=True) * 100
         dfProportion['Cumulative %'] = dfProportion['Percent'].cumsum()
 
         if verbose==True:
@@ -297,6 +298,7 @@ class ExploratoryDataAnalyzer:
         plot_bar_graph(most_unpopular, title='Second', n=n)
 
     def multi_ecdf(self, series_to_compute: list, title: str, xlabel: str, legend_title: str):
+
         for series in series_to_compute:
             x, y = Stats().empirical_cumulative_distribution(series)
             _ = plt.plot(x, y, marker='.', linestyle='none', alpha=.6, label=series.name)
@@ -307,3 +309,4 @@ class ExploratoryDataAnalyzer:
         plt.margins(0.02)
         plt.legend(loc='lower right', fancybox=True, facecolor='white', shadow=True, title=legend_title)
         plt.show()
+
