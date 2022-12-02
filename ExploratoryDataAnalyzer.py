@@ -83,8 +83,8 @@ class ExploratoryDataAnalyzer:
             Prints dataframes grouped by target predictor with mean and median statistics.
         '''
         
-        means = self.df.groupby(self.target).mean().round(0).reset_index(drop=True)
-        medians = self.df.groupby(self.target).median().reset_index(drop=True)
+        means = self.df.groupby(self.target).mean(numeric_only=True).round(0).reset_index(drop=True)
+        medians = self.df.groupby(self.target).median(numeric_only=True).reset_index(drop=True)
 
         print(f'mean stats: \n {means} \n')
         print(f'median stats: \n {medians} \n')
