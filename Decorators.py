@@ -35,10 +35,11 @@ class IgnoreWarnings:
 
     def ignore_multiple_warnings(self, warning_list: list):
         """
-        Ignore a given warning occurring during method execution.
+        Ignores specified warnings during method execution.
 
-        Args:
-            warning (Warning): warning type to ignore.
+        Parameters
+            warning_list: list
+                The warnings you want to ignore, such as FutureWarning
 
         Returns:
             the inner function
