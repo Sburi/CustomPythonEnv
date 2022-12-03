@@ -1,4 +1,6 @@
+
 import pandas as pd
+
 
 class Standardize:
     '''
@@ -17,6 +19,8 @@ class Standardize:
     def __init__(self, df: pd.DataFrame, print_conversions: bool):
         self.df = df
         self.print_conversions = print_conversions
+
+    ### Standarize Column Value ###
 
     def standardize_column_values(self, conversion_dict: dict, current_col: str, revised_col=''):
         '''
@@ -49,7 +53,7 @@ class Standardize:
         if revised_col == '':
             revised_col = current_col
 
-        #normalize vendors
+        #normalize values
         temp_conversion_col = '>Converted To<'
         for k,v in conversion_dict.items():
             self.df.loc[
@@ -307,8 +311,62 @@ class Standardize:
         self.standardize_column_values(conversion_dict=conversion_dictionary, current_col=current_col, revised_col=revised_col)
         return self.df   
 
+    ### Standardize Column Headers ###
+
+    def standardize_column_headers(self, conversion_dict: dict):
+        '''
+        Purpose
+        ----------
+            Provides system that loops through a dictionary and provided column inputs. If dictionary value is found, value is converted to dictionary key. Case sensitive.
+
+        Parameters
+        ----------
+            conversion_dict: dict
+                A dictionary where the keys are the standardized column names and the values are lists of non-standard ways that the standardized column names may occur.
+        
+        Example
+        ----------
+            Given the below dictionary, this method will loop through the current_col looking for the dictionary values 'incorrect_1' and 'incorrect_2', if it finds those columns, it will convert them to 'Correct_Columnname' in the revised_col. Conversions may also be printed for reference.
+            dict = {
+                'Correct_Columnname' : ['incorrect_1', 'incorrect_2'],
+            }
+
+        Output
+        ----------
+            Modifies this classes self.df. The sub-calls of this standardizer directly return df for their specific use-cases. If this method is used independently and fed a dictionary, then you can extract the dataframe by obtaining the .df attribute of this class.
+        '''
+
+        #setup to see conversions
+        dct_conversions = {}
+
+        #renames columns
+        for k, v in conversion_dict.items():
+            for subv in v:
+                for col in self.df.columns:
+                    if col==subv:
+                        dct_conversions[subv] = k
+                        self.df = self.df.rename(columns={col: k}) 
+
+        #find and print changes if needed
+        dfconversions = pd.DataFrame.from_dict(data=dct_conversions, orient='index', columns=['Converted To'])
+        dfconversions = dfconversions.reset_index().rename(columns={'index': 'Original Value'})
+
+        #print if no conversions
+        if self.print_conversions and len(dfconversions)==0:
+            return print('No conversions needed/found')
+
+        #print if conversions
+        if self.print_conversions and len(dfconversions)>0:
+            return print(dfconversions)
+
+
+
 if __name__ == '__main__':
 
+    #imports
+    from CustomEnv.TestDataFrames import dfsimple
+    
+    #testing column value renames
     def test_simplify_no_results():
         dftest = pd.DataFrame({
             'Prioritization Category': ['Objective', 'Objective', 'ABO', 'ABO', np.nan, 'NaN'],
@@ -323,9 +381,21 @@ if __name__ == '__main__':
             'Vendor': ['Activeops USA', 'Activeops Usa Inc.', 'ActiveOps']
         }) 
         
-
         standardizer = Standardize(df=dftest, print_conversions=True)
         standardizer.vendors(current_col='Vendor', revised_col='Vendor')
 
-    test_simplify_no_results()
-    test_simplify_with_results()
+    #test_simplify_no_results()
+    #test_simplify_with_results()
+
+    #testing column header renames
+    def test_header_renames_with_results(df):
+        conversion_dict = {
+            'count_numbers': ['sum_numbers'],
+        }
+        
+        standardize = Standardize(df=df, print_conversions=True)
+        standardize.standardize_column_headers(conversion_dict=conversion_dict)
+
+    test_header_renames_with_results(df=dfsimple)
+
+
