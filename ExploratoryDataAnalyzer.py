@@ -155,6 +155,25 @@ class ExploratoryDataAnalyzer:
             plt.clf()
             plt.close()
 
+    def show_blanks(self):
+        '''
+        Purpose
+        -----------
+            Shows blank counts and percents of total per column
+
+        Parameters
+        -----------
+            None
+
+        Outputs
+        -----------
+            Dataframe showing blank counts per column
+        '''
+
+        dfblanks = self.df.isna.count()
+
+        return dfblanks
+    
     def plot_blanks_per_column(self):
         '''
         Purpose
@@ -310,3 +329,13 @@ class ExploratoryDataAnalyzer:
         plt.legend(loc='lower right', fancybox=True, facecolor='white', shadow=True, title=legend_title)
         plt.show()
 
+if __name__ == '__main__':
+
+    from TestDataFrames import dfsimple
+
+    class TestEDA:
+
+        def __init__(self, df):
+            self.df = df
+    
+        def test_show_blanks(self):
