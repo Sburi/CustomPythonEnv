@@ -364,38 +364,55 @@ class Standardize:
 if __name__ == '__main__':
 
     #imports
+    import numpy as np
+    import pandas as pd
     from CustomEnv.TestDataFrames import dfsimple
     
-    #testing column value renames
-    def test_simplify_no_results():
-        dftest = pd.DataFrame({
-            'Prioritization Category': ['Objective', 'Objective', 'ABO', 'ABO', np.nan, 'NaN'],
-            'Another Column': [1, 2, 'three', 'four', 5, 6.5],
-        }) 
+    class TestClass:
+
+        def __init__(self, df1: pd.DataFrame):
+            self.df1 = df1
+    
+        def value_renames_no_results(self):
+            dftest = pd.DataFrame({
+                'Prioritization Category': ['Objective', 'Objective', 'ABO', 'ABO', np.nan, 'NaN'],
+                'Another Column': [1, 2, 'three', 'four', 5, 6.5],
+            }) 
+            
+            standardizer = Standardize(df=dftest, print_conversions=True)
+            standardizer.prioritization_categories(current_col='Prioritization Category', revised_col='Priorization Category')
+
+        def value_renames_with_results(self):
+            dftest = pd.DataFrame({
+                'Vendor': ['Activeops USA', 'Activeops Usa Inc.', 'ActiveOps']
+            }) 
+            
+            standardizer = Standardize(df=dftest, print_conversions=True)
+            standardizer.vendors(current_col='Vendor', revised_col='Vendor')
+
+        def header_renames_no_results(self):
+            conversion_dict = {
+                'count_numbers': ['SUM_numbers'],
+            }
+            
+            standardize = Standardize(df=self.df1, print_conversions=True)
+            standardize.standardize_column_headers(conversion_dict=conversion_dict)
         
-        standardizer = Standardize(df=dftest, print_conversions=True)
-        standardizer.prioritization_categories(current_col='Prioritization Category', revised_col='Priorization Category')
+        def header_renames_with_results(self):
+            conversion_dict = {
+                'count_numbers': ['sum_numbers'],
+            }
+            
+            standardize = Standardize(df=self.df1, print_conversions=True)
+            standardize.standardize_column_headers(conversion_dict=conversion_dict)
 
-    def test_simplify_with_results():
-        dftest = pd.DataFrame({
-            'Vendor': ['Activeops USA', 'Activeops Usa Inc.', 'ActiveOps']
-        }) 
-        
-        standardizer = Standardize(df=dftest, print_conversions=True)
-        standardizer.vendors(current_col='Vendor', revised_col='Vendor')
+        def run_pipeline(self):
+            self.value_renames_no_results()
+            self.value_renames_with_results()
+            self.header_renames_no_results()
+            self.header_renames_with_results()
 
-    #test_simplify_no_results()
-    #test_simplify_with_results()
-
-    #testing column header renames
-    def test_header_renames_with_results(df):
-        conversion_dict = {
-            'count_numbers': ['sum_numbers'],
-        }
-        
-        standardize = Standardize(df=df, print_conversions=True)
-        standardize.standardize_column_headers(conversion_dict=conversion_dict)
-
-    test_header_renames_with_results(df=dfsimple)
+    test_class = TestClass(df1=dfsimple)
+    test_class.header_renames_no_results()
 
 
