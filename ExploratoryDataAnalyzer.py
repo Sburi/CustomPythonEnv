@@ -170,9 +170,22 @@ class ExploratoryDataAnalyzer:
             Dataframe showing blank counts per column
         '''
 
-        dfblanks = self.df.isna.count()
+        #change blanks to nulls
+        self.df = self.df.replace({'': np.nan}) 
 
-        return dfblanks
+        #count nulls
+        dfblanks = self.df.isnull().sum()
+        dfblanks = dfblanks.reset_index().rename(columns={'index': 'Column', 0: 'Blank Count'})
+        
+        #filter to nonzero
+        dfblanks = dfblanks[dfblanks['Blank Count']>0]
+
+        #obtain percent blank
+        dfblanks['Blank Percent'] = dfblanks['Blank Count'] / len(self.df) * 100
+
+        #return
+        dfblanks.style.set_precision(0)
+        return print(dfblanks)
     
     def plot_blanks_per_column(self):
         '''
@@ -188,6 +201,7 @@ class ExploratoryDataAnalyzer:
         -----------
             Bar graph showing blank counts per column
         '''
+        
         df_blanks = self.df.isnull().sum().rename('Count')
         df_blanks = df_blanks.reset_index()
         df_blanks = df_blanks[df_blanks['Count']>0]
@@ -331,7 +345,9 @@ class ExploratoryDataAnalyzer:
 
 if __name__ == '__main__':
 
-    from TestDataFrames import dfsimple
+    #imports
+    from TestDataFrames import dfwithblanks
+    
 
     class TestEDA:
 
@@ -339,3 +355,9 @@ if __name__ == '__main__':
             self.df = df
     
         def test_show_blanks(self):
+            eda = ExploratoryDataAnalyzer(df=self.df, predictors=None, target=None)
+            eda.show_blanks()
+
+    eda = TestEDA(df=dfwithblanks)
+    eda.test_show_blanks()
+    
