@@ -55,7 +55,7 @@ class ExploratoryDataAnalyzer:
             A dataframe with counts, percents, and cumulative percents for the given target column.
         '''
         
-        self.df.style.set_precision(0)
+        self.df.style.set_properties(precision=0)
         dfProportion = pd.DataFrame()
         dfProportion['Count'] = self.df[col].value_counts(normalize=False)
         dfProportion['Percent'] = self.df[col].value_counts(normalize=True) * 100
@@ -183,8 +183,11 @@ class ExploratoryDataAnalyzer:
         #obtain percent blank
         dfblanks['Blank Percent'] = dfblanks['Blank Count'] / len(self.df) * 100
 
+        #sort
+        dfblanks = dfblanks.sort_values(by='Blank Percent', ascending=False)
+
         #return
-        dfblanks.style.set_precision(0)
+        dfblanks.style.set_properties(precision=0)
         return print(dfblanks)
     
     def plot_blanks_per_column(self):
@@ -256,7 +259,7 @@ class ExploratoryDataAnalyzer:
         '''
         
         # Compute the correlation matrix
-        corr = self.df.corr(method = 'pearson')
+        corr = self.df.corr(method = 'pearson', numeric_only=True)
 
         # Generate a mask for the upper triangle
         mask = np.triu(np.ones_like(corr, dtype=bool))
