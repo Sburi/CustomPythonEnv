@@ -243,7 +243,7 @@ class ExploratoryDataAnalyzer:
         plt.title('Prediction Balance')
         plt.show()
 
-    def plot_correlation_matrix(self):
+    def plot_correlation_matrix(self, numeric_only=True):
         '''
         Purpose
         -----------
@@ -259,7 +259,7 @@ class ExploratoryDataAnalyzer:
         '''
         
         # Compute the correlation matrix
-        corr = self.df.corr(method = 'pearson', numeric_only=True)
+        corr = self.df.corr(method = 'pearson', numeric_only=numeric_only)
 
         # Generate a mask for the upper triangle
         mask = np.triu(np.ones_like(corr, dtype=bool))
