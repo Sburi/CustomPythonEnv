@@ -346,21 +346,43 @@ class ExploratoryDataAnalyzer:
         plt.legend(loc='lower right', fancybox=True, facecolor='white', shadow=True, title=legend_title)
         plt.show()
 
+    def find_optimal_bin_size(self, col_to_bin: str, max_bins: int):
+
+
+        col_bin = f'{col_to_bin}_binned'
+
+
+        for bin_count in range(1,max_bins+1):
+            label_set = [range(0, max_bins)]
+            print('label set: ', label_set)
+            self.df[col_bin] = pd.cut(self.df[col_to_bin], bins=bin_count, labels=label_set).astype('int')
+
 if __name__ == '__main__':
 
     #imports
-    from TestDataFrames import dfwithblanks
+    import numpy as np
+    import pandas as pd
+    
+    from TestDataFrames import dfwithblanks, dfforbins
     
 
     class TestEDA:
 
-        def __init__(self, df):
-            self.df = df
+        def __init__(self, dfwithblanks, dfforbins):
+            self.dfwithblanks = dfwithblanks
+            self.dfforbins = dfforbins
     
         def test_show_blanks(self):
-            eda = ExploratoryDataAnalyzer(df=self.df, predictors=None, target=None)
+            eda = ExploratoryDataAnalyzer(df=self.dfwithblanks, predictors=None, target=None)
             eda.show_blanks()
 
-    eda = TestEDA(df=dfwithblanks)
+        def test_find_optimal_bins(self):
+            eda = ExploratoryDataAnalyzer(df=self.dfforbins, predictors=['Age'], target='Survived')
+            eda.find_optimal_bin_size(col_to_bin='Age', max_bins=10)
+
+
+    eda = TestEDA(dfwithblanks=dfwithblanks, dfforbins=dfforbins)
     eda.test_show_blanks()
+
+
     
