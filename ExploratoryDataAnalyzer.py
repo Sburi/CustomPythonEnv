@@ -352,10 +352,11 @@ class ExploratoryDataAnalyzer:
         col_bin = f'{col_to_bin}_binned'
 
 
-        for bin_count in range(1,max_bins+1):
-            label_set = [range(0, max_bins)]
+        for bin_count in range(2,max_bins+2):
+            print('\n\nbin count: ', bin_count)
+            label_set = list(range(0, bin_count))
             print('label set: ', label_set)
-            self.df[col_bin] = pd.cut(self.df[col_to_bin], bins=bin_count, labels=label_set).astype('int')
+            self.df[col_bin] = pd.cut(self.df[col_to_bin].astype('float'), bins=bin_count, labels=label_set)
 
 if __name__ == '__main__':
 
@@ -382,7 +383,7 @@ if __name__ == '__main__':
 
 
     eda = TestEDA(dfwithblanks=dfwithblanks, dfforbins=dfforbins)
-    eda.test_show_blanks()
+    eda.test_find_optimal_bins()
 
 
     
