@@ -154,7 +154,7 @@ class ForecastingMetrics:
         percent = self.rmse / self.mean
 
         frmt = Formats()
-        percent = frmt.percents(percent)
+        percent = frmt.percents(number=percent, n_decimals=2)
 
         print(f'Mean % of RMSE: {percent}')
 
