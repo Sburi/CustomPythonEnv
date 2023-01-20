@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from IPython.display import display, HTML
 
 class MultiDataFrameMethods:
     '''
@@ -111,7 +112,8 @@ class MultiDataFrameMethods:
         '''
         
         for df in self.dataframes:
-            print(df.head(rows_to_print), '\n')
+            #print(df.head(rows_to_print), '\n')
+            display(HTML(df.head(rows_to_print).to_html()))
 
 if __name__ == "__main__":
     # df1 = pd.DataFrame()

@@ -56,6 +56,7 @@ class Standardize:
         #normalize values
         temp_conversion_col = '>Converted To<'
         for k,v in conversion_dict.items():
+            #print(f'checking if key({k}) is in values({v})')
             self.df.loc[
                 self.df[current_col].astype('str').str.lower().isin([i.lower() for i in v]),
             temp_conversion_col] = k
@@ -108,10 +109,11 @@ class Standardize:
             'Avaya': ['Avaya Inc'],
             'Axim': ['Axim Inc'],
             'Citrix': ['Citrix Systems Inc'],
-            'Clarabridge': ['Clarabridge Inc'],
+            'Qualtrics': ['Clarabridge Inc', 'Clarabridge', 'CLARABRIDGE INC', 'Qualtrics, Llc'], 
             'Cogito': ['Cogito Corporation', 'Cogito Corp'],
             'Concentrix': ['Concentrix Cvg Llc Fka Intervoice Llc'],
             'Convergent': ['Convergent Solutions Group Llc Dba Csg Global Consulting'],
+            'Deloitte': ['DELOITTE CONSULTING LLP'],
             'Eliassen': ['Eliassen Group, Llc'],
             'Enclara': ['Enclara Budget'],
             'Enghouse': ['Enghouse Interactive', 'Enghouse Interactive Inc.'],
@@ -124,7 +126,6 @@ class Standardize:
             'MPulse': ['Mpulse Mobile Inc'],
             'Nuance': ['NUANCE COMMUNICATIONS, INC.', 'Nuance Communications'],
             'Oracle': ['Oracle America Inc'],
-            'Qualtrics': ['Qualtrics, Llc'],
             'Salesforce': ['Salesforce.Com, Inc.'],
             'Syncsort': ['Syncsort Incorporated', 'Syncsort Incorporated Nj'],
             'TCS': ['TATA CONSULTANCY SERVICES LIMITED', 'TATA CONSULTING SERVICES LIMITED', 'Tcs '],
@@ -384,7 +385,7 @@ if __name__ == '__main__':
 
         def value_renames_with_results(self):
             dftest = pd.DataFrame({
-                'Vendor': ['Activeops USA', 'Activeops Usa Inc.', 'ActiveOps']
+                'Vendor': ['Activeops USA', 'Activeops Usa Inc.', 'CLARABRIDGE INC', 'check']
             }) 
             
             standardizer = Standardize(df=dftest, print_conversions=True)
@@ -413,6 +414,6 @@ if __name__ == '__main__':
             self.header_renames_with_results()
 
     test_class = TestClass(df1=dfsimple)
-    test_class.header_renames_no_results()
+    test_class.value_renames_with_results()
 
 
