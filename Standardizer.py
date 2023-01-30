@@ -55,19 +55,21 @@ class Standardize:
 
         #normalize values
         temp_conversion_col = '>Converted To<'
+        df = self.df.copy()
         for k,v in conversion_dict.items():
             #print(f'checking if key({k}) is in values({v})')
-            self.df.loc[
-                self.df[current_col].astype('str').str.lower().isin([i.lower() for i in v]),
+            df.loc[
+                df[current_col].astype('str').str.lower().isin([i.lower() for i in v]),
             temp_conversion_col] = k
-        self.df[temp_conversion_col] = self.df[temp_conversion_col].fillna(self.df[current_col])
+        df[temp_conversion_col] = df[temp_conversion_col].fillna(df[current_col])
+        self.df = df.copy()
 
         #find out if conversion occurred
         col_conversion_occurred = '>Conversion Occurred?<'
         change_occured = (self.df[current_col] != self.df[temp_conversion_col])
         results_not_nans = (self.df[current_col].notna() & self.df[temp_conversion_col].notna())
         self.df[col_conversion_occurred] = change_occured & (results_not_nans)
-        dfconversions = self.df[self.df[col_conversion_occurred]==True][[current_col, temp_conversion_col, col_conversion_occurred]]
+        dfconversions = self.df[self.df[col_conversion_occurred]==True][[current_col, temp_conversion_col, col_conversion_occurred]].copy()
 
         #if no conversions
         if self.print_conversions and dfconversions.empty:
@@ -345,8 +347,13 @@ class Standardize:
             for subv in v:
                 for col in self.df.columns:
                     if col==subv:
-                        dct_conversions[subv] = k
-                        self.df = self.df.rename(columns={col: k}) 
+                        
+                        #if key is already in column set, do not replace as this would cause a duplicate column to be in the dataframe
+                        if k in self.df.columns:
+                            print(f'Column {col} not replaced, as replacing {col} with {k} would cause column duplication')
+                        else:
+                            dct_conversions[subv] = k
+                            self.df = self.df.rename(columns={col: k}) 
 
         #find and print changes if needed
         dfconversions = pd.DataFrame.from_dict(data=dct_conversions, orient='index', columns=['Converted To'])
