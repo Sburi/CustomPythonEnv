@@ -5,12 +5,6 @@ import os
 #custom
 from CustomEnv.Standardizer import Standardize
 
-# #configs
-# from configparser import ConfigParser
-# config = ConfigParser()
-# config.read(r'C:\Users\SIB4953\Humana\Documents\My Files\Python\By Project\Costs by Capability\Configs\configs_budgetsbycapability.ini')
-# filepaths = config['filepaths']
-
 class BackupGenerator:
     '''
     Purpose
@@ -21,8 +15,12 @@ class BackupGenerator:
     -------------
         df: pd.DataFrame
             The dataframe you want to backup.
+        filename: str
+            The name of the file.
+        sheetname: str
+            The name of the sheet.
         filepath: str
-            The path to the dataframe you are backing up.
+            The fully qualified path to the dataframe and file you are backing up.
         column_header_conversion_dict: dict
             Optional. A dictionary where the keys are the standardized header names and the values are the non-standard header names you need to unify. Useful if columns have changed over time.
         standardize_column_values_dict: dict
@@ -33,16 +31,20 @@ class BackupGenerator:
         columnns_to_drop: list
             Optional. Any columns you want to drop.
         columnname_save_date: str
-            Optional. If you want to use a different backup name than 'date_of_backup' you may place it here.
-
+            Optional. If you want to use a different backup name than 'date_of_backup' you may place it here. May be useful if you happened to already have a date_of_backup column in your dataset used for other purposes.
+        print_conversions: bool
+            Optional. Default is false. True if you want to print conversions.
     '''
-    def __init__(self, df: pd.DataFrame, filepath=None, column_header_conversion_dict=None, standardize_column_values_dict=None, columnns_to_drop=None, columnname_save_date=None):
+    def __init__(self, df: pd.DataFrame, filename: str, sheetname: str, filepath=None, column_header_conversion_dict=None, standardize_column_values_dict=None, columnns_to_drop=None, columnname_save_date=None, print_conversions=False):
         #vars set on instantiation
         self.df = df
         self.filepath = filepath
+        self.filename = filename
+        self.sheetname = sheetname
         self.column_header_conversion_dict = column_header_conversion_dict
         self.standardize_column_values_dict = standardize_column_values_dict
         self.columnns_to_drop = columnns_to_drop
+        self.print_conversions = print_conversions
         
         #vars set during execution
         self.save_date = ''
@@ -66,7 +68,7 @@ class BackupGenerator:
     
     def create_backup_folder_if_needed(self):
         #obtain path
-        self.savepath = f'{self.filepath}\\AutomaticBackups'
+        self.savepath = f'{self.filepath}\\AutomaticBackups\\ForFile_{self.filename}\\ForSheet_{self.sheetname}\\Data'
         
         #check if path exists
         exists = os.path.exists(self.savepath)
@@ -96,7 +98,7 @@ class BackupGenerator:
             
             #standardize column headers
             if self.column_header_conversion_dict!=None:
-                standardize = Standardize(df=df, print_conversions=False)
+                standardize = Standardize(df=df, print_conversions=self.print_conversions)
                 standardize.standardize_column_headers(conversion_dict=self.column_header_conversion_dict)
                 df = standardize.df
 
@@ -117,7 +119,7 @@ class BackupGenerator:
             for k,v in self.standardize_column_values_dict.items():
                 column=k
                 conversion_dict = v
-                standardize = Standardize(df=self.dfcombined, print_conversions=False)
+                standardize = Standardize(df=self.dfcombined, print_conversions=self.print_conversions)
                 standardize.standardize_column_values(conversion_dict=conversion_dict, current_col=column)
                 self.dfcombined = standardize.df
     
