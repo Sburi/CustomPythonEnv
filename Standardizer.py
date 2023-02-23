@@ -28,6 +28,10 @@ class Standardize:
         ----------
             Provides system that loops through a dictionary and provided column inputs. If dictionary value is found, value is converted to dictionary key.
 
+        NOTES
+        --------
+            The match will be case insensitive, and will also convert the column to an object datatype so that the case will not impact the results.
+
         Parameters
         ----------
             conversion_dict: dict
@@ -57,9 +61,11 @@ class Standardize:
         temp_conversion_col = '>Converted To<'
         df = self.df.copy()
         for k,v in conversion_dict.items():
-            #print(f'checking if key({k}) is in values({v})')
+            
+            values_to_change = [str(i).lower() for i in v]
+
             df.loc[
-                df[current_col].astype('str').str.lower().isin([i.lower() for i in v]),
+                (df[current_col].astype('str').str.lower().isin(values_to_change)),
             temp_conversion_col] = k
         df[temp_conversion_col] = df[temp_conversion_col].fillna(df[current_col])
         self.df = df.copy()
@@ -111,7 +117,6 @@ class Standardize:
             'Avaya': ['Avaya Inc'],
             'Axim': ['Axim Inc'],
             'Citrix': ['Citrix Systems Inc'],
-            'Qualtrics': ['Clarabridge Inc', 'Clarabridge', 'CLARABRIDGE INC', 'Qualtrics, Llc'], 
             'Cogito': ['Cogito Corporation', 'Cogito Corp'],
             'Concentrix': ['Concentrix Cvg Llc Fka Intervoice Llc'],
             'Convergent': ['Convergent Solutions Group Llc Dba Csg Global Consulting'],
@@ -124,17 +129,20 @@ class Standardize:
             'IBM': ['Ibm Corporation'],
             'InMoment': ['Inmoment, Inc'],
             'Intradiem': ['Intradiem, Inc', 'Intradiem Inc'],
+            'Kiosk': ['KIOSK INFORMATION SYSTEMS INC'],
             'Mattersight': ['Mattersight Corporation', ''],
             'MPulse': ['Mpulse Mobile Inc'],
             'Nuance': ['NUANCE COMMUNICATIONS, INC.', 'Nuance Communications'],
             'Oracle': ['Oracle America Inc'],
+            'Qualtrics': ['Clarabridge Inc', 'Clarabridge', 'CLARABRIDGE INC', 'Qualtrics, Llc'], 
             'Salesforce': ['Salesforce.Com, Inc.'],
             'Syncsort': ['Syncsort Incorporated', 'Syncsort Incorporated Nj'],
             'TCS': ['TATA CONSULTANCY SERVICES LIMITED', 'TATA CONSULTING SERVICES LIMITED', 'Tcs '],
             'Twilio': ['Twilio Inc'],
-            'Verint': ['Verint Americs Inc', 'Verint Americas Inc'],
+            'Verint': ['Verint Americs Inc', 'Verint Americas Inc', 'VERINT AMERICAS INC.'],
             'Vs Brooks Inc': ['Vs Brooks Inc'],
             'World Wide Technologies': ['Wwt'],
+
         }
 
         self.standardize_column_values(conversion_dict=conversion_dictionary, current_col=current_col, revised_col=revised_col)
@@ -190,11 +198,17 @@ class Standardize:
            Dataframe
         '''
 
+        # conversion_dictionary = {
+        #     'Objective': ['Objective'],
+        #     'ABO': ['ABO'],
+        #     'IOP': ['IOP'],
+        #     'RUN': ['RUN'],
+        # }
+
+        #2/4/2023 changed from above to below
         conversion_dictionary = {
-            'Objective': ['Objective'],
-            'ABO': ['ABO'],
-            'IOP': ['IOP'],
-            'RUN': ['RUN'],
+            'Objective': ['Objective', 'ABO', 'IOP'],
+            'Run': ['Run'],
         }
 
         self.standardize_column_values(conversion_dict=conversion_dictionary, current_col=current_col, revised_col=revised_col)
