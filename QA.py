@@ -1,5 +1,7 @@
 import pandas as pd
 
+from TestDataFrames import dfsimple
+
 from Formats import Formats
 fmt = Formats()
 
@@ -54,7 +56,7 @@ class QARawvsFinal:
             Compares starting vs final sum, including any expected variances.
 
         Parameters
-            raw_filter_criteria: (df[df['col']=''])
+            raw_filter_criteria: (df.column != 'This')
                 If needed, add filtering criteria for raw starting dataframe
             starting_column_name: str
                 The name of the column in the starting raw data that you want to sum.
@@ -116,3 +118,52 @@ class QARawvsFinal:
             final = f'Final: {final_sum}'
             variance = f'Variance: {variance}'
             return print(result, start, final, variance, '', sep='\n')
+
+
+    # def compare_dataframes(self, col):
+    #     #round
+    #     dfmerge[col_mainforecasttable] = dfmerge[col_mainforecasttable].round(0)
+    #     dfmerge[col_dlforecasttable] = dfmerge[col_dlforecasttable].round(0)
+
+    #     #create variance column
+    #     dfmerge[col_variance] = dfmerge[col_mainforecasttable] - dfmerge[col_dlforecasttable]
+    #     dfmerge[col_variance] = dfmerge[col_variance].round(0)
+    #     dfmerge[col_variance] = dfmerge[col_variance].fillna(0)
+
+    #     #anaylze
+    #     dfmerge.loc[
+    #         dfmerge[col_variance].round(0)!=0,
+    #     'Equal'] = 'FALSE'
+
+    #     #filter
+    #     dfmerge = dfmerge[dfmerge['Equal'] == 'FALSE']
+    #     dfmerge = dfmerge.drop(columns=['Equal'])
+
+    #     #show results
+    #     if len(dfmerge)==0:
+    #         print('|✓| Staying in pre-existing org matches between main and direct labor tables.')
+    #     else:
+    #         print('|X| Staying in pre-existing org does not between main and direct labor tables.\n')
+        
+    #         #format columns
+    #         columns = [col_mainforecasttable, col_dlforecasttable]
+    #         for col in columns:
+    #             dfmerge[col] = dfmerge[col].fillna(0)
+    #             dfmerge[col] = dfmerge[col].apply(lambda x: f"${x*1:,.0f}")
+    #         print(dfmerge)
+
+
+if __name__=='__main__':
+    def test_qa_rawvsfinal(df: pd.DataFrame):
+
+        #change df
+        dffinal = dfsimple.copy()
+        dffinal = dffinal[dffinal.text!='This']
+
+        #write filter for class
+        #self.dfraw[raw_filter_criteria]
+        filter = (df.text != 'This')
+        
+        QARawvsFinal(dfraw=df, dffinal=dffinal).compare_starting_vs_final_nongrouped(raw_filter_criteria=filter, starting_col_name='sum_numbers', ending_col_name='sum_numbers', is_currency=False)
+
+    test_qa_rawvsfinal(df=dfsimple)
