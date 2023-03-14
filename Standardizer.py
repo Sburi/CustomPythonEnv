@@ -136,6 +136,7 @@ class Standardize:
             'Oracle': ['Oracle America Inc'],
             'Qualtrics': ['Clarabridge Inc', 'Clarabridge', 'CLARABRIDGE INC', 'Qualtrics, Llc'], 
             'Salesforce': ['Salesforce.Com, Inc.'],
+            'Stars': ['STARS MODEL MANAGEMENT INC DBA STARS MANAGEMENT'],
             'Syncsort': ['Syncsort Incorporated', 'Syncsort Incorporated Nj'],
             'TCS': ['TATA CONSULTANCY SERVICES LIMITED', 'TATA CONSULTING SERVICES LIMITED', 'Tcs '],
             'Twilio': ['Twilio Inc'],
@@ -335,6 +336,10 @@ class Standardize:
         Purpose
         ----------
             Provides system that loops through a dictionary and provided column inputs. If dictionary value is found, value is converted to dictionary key. Case sensitive.
+            The benefit of using the standardizer over a standard .rename(columns=dict) are as follows:
+                - A list of possible values can be passed to the standardizer
+                - The standardizer will detect and prevent renaming a column to another column that already exists whereas a standard rename will simply allow for duplicate columns causing downstream impacts.
+                - Conversions can be printed out as needed
 
         Parameters
         ----------
@@ -364,7 +369,7 @@ class Standardize:
                         
                         #if key is already in column set, do not replace as this would cause a duplicate column to be in the dataframe
                         if k in self.df.columns:
-                            print(f'Column {col} not replaced, as replacing {col} with {k} would cause column duplication')
+                            print(f'Column {col} not replaced, as replacing {col} with {k} would cause column duplication since column {k} already exists in the dataframe')
                         else:
                             dct_conversions[subv] = k
                             self.df = self.df.rename(columns={col: k}) 
