@@ -91,7 +91,7 @@ class MultiDataFrameMethods:
         dfCompare = dfCompare.reset_index()
 
         #sort
-        dfCompare = dfCompare.sort_values('All Columns')
+        #dfCompare = dfCompare.sort_values('All Columns')
 
         return dfCompare
 
@@ -112,7 +112,7 @@ class MultiDataFrameMethods:
         '''
         
         for df in self.dataframes:
-            #print(df.head(rows_to_print), '\n')
+            print(df.head(rows_to_print), '\n')
             display(HTML(df.head(rows_to_print).to_html()))
 
 if __name__ == "__main__":
