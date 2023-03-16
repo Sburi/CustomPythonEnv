@@ -3,9 +3,17 @@ import pandas as pd
 from TestDataFrames import dfsimple
 
 from Formats import Formats
-fmt = Formats()
 
-from IPython.display import display, HTML
+from IPython.display import display, HTML 
+from IPython.core.interactiveshell import InteractiveShell
+InteractiveShell.ast_node_interactivity = 'all'
+#pd.options.display.max_rows = 999
+pd.set_option('display.float_format', lambda x: '%.2f' % x)
+pd.set_option('display.expand_frame_repr', False)
+pd.set_option('display.max_rows', 100)
+pd.set_option('display.max_columns', 100)
+
+pd.options.display.float_format = '{:,.0f}'.format
 
 from types import SimpleNamespace
 
@@ -106,9 +114,9 @@ class QARawvsFinal:
 
         #format sums for printing
         if is_currency:
-            starting_sum = fmt.currency(starting_sum)
-            final_sum = fmt.currency(final_sum)
-            variance = fmt.currency(variance)
+            numbers = [starting_sum, final_sum, variance]
+
+            [starting_sum, final_sum, variance] = Formats(numbers).currency()
 
         #result if equivalent
         if equivalent==True:
@@ -225,7 +233,7 @@ class QATwoDataFrames:
         self.df1 = df1
         self.df2 = df2
     
-    def compare_valuecolumn_acrossgroups(self, df1_groupby_columns: list[str], df2_groupby_columns: list[str], df1_value_column: str, df2_value_column: str):
+    def compare_valuecolumn_acrossgroups(self, df1_groupby_columns: list[str], df2_groupby_columns: list[str], df1_value_column: str, df2_value_column: str, is_currency=True):
 
         '''
         Combines two dataframes and compares single value column across dataframes.
@@ -240,6 +248,8 @@ class QATwoDataFrames:
                 The name of the value column in the classes first dataframe.
             df2_value_column: str
                 The name of the value column in the classes second dataframe.
+            is_currency: bool
+                Optional, default is True. Converts results to currency if selected.
         
         '''
 
@@ -281,18 +291,59 @@ class QATwoDataFrames:
             self.dfcombined = pd.pivot_table(data=self.dfcombined, index=df2_groupby_columns, columns='df_source', values=df2_value_column).reset_index()
             self.dfcombined.columns.name = None
 
+        def fill_nas():
+            self.dfcombined[self.df1.name] = self.dfcombined[self.df1.name].fillna(0)
+            self.dfcombined[self.df2.name] = self.dfcombined[self.df2.name].fillna(0)
+        
         def add_variance_column():
             self.dfcombined['variance'] = self.dfcombined[self.df2.name] - self.dfcombined[self.df1.name]
+            self.dfcombined = self.dfcombined.sort_values(by='variance', ascending=False)
+        
+        def obtain_overall_change():
+            df1_aggregate_value = self.dfcombined[self.df1.name].sum()
+            df2_aggregate_value = self.dfcombined[self.df2.name].sum()
+            variance_aggregate_value = self.dfcombined['variance'].sum()
+
+            nums_to_convert = [df1_aggregate_value, df2_aggregate_value, variance_aggregate_value]
+            [df1_aggregate_value, df2_aggregate_value, variance_aggregate_value] = Formats(numbers_to_convert = nums_to_convert).currency()
+
+            print('Summary')
+            print(f'df1 overall: {df1_aggregate_value}') 
+            print(f'df2 overall: {df2_aggregate_value}')
+            print(f'variance overall: {variance_aggregate_value}')
+        
+        def convert_to_float():
+            col_list = [self.df1.name, self.df2.name, 'variance']
+            for col in col_list:
+                self.dfcombined[col] = self.dfcombined[col].astype('float')
+
+        def reorder_columns():
+            correct_order = df2_groupby_columns + [self.df1.name, self.df2.name, 'variance']
+            self.dfcombined = self.dfcombined[correct_order]
+
 
         def run_pipeline():
+            #clean
             standardize_value_column_name()
             standardize_group_by_column_name()
             add_dataframe_source_column()
+
+            #combine
             combine_dataframes()
             round_value_column()
             groupby_and_compare()
+
+            #pivot
             pivot_source()
+            fill_nas()
             add_variance_column()
+
+            #get basic stats
+            obtain_overall_change()
+
+            #format
+            convert_to_float()
+            reorder_columns()
 
             return self.dfcombined
 
